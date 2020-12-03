@@ -1,0 +1,10 @@
+/build/
+/vendor/
+# /composer.lock
+
+/.php_cs.cache
+/.settings/
+/.buildpath
+/composer.lock
+/.idea
+/.vscode
