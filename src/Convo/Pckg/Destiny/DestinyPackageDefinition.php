@@ -4,7 +4,7 @@ namespace Convo\Pckg\Destiny;
 
 use Convo\Core\Factory\AbstractPackageDefinition;
 
-class DestinyPackageDefintion extends AbstractPackageDefinition
+class DestinyPackageDefinition extends AbstractPackageDefinition
 {
 	const NAMESPACE = 'convo-destiny';
 
