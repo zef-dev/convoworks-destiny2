@@ -10,11 +10,14 @@
     ],
     "license" : "MIT",
     "require" : {
-        "php" : "^7.2"
+        "php" : "^7.2",
+		"psr/log" : "^1.1.0",
+        "zef-dev/convoworks-core" : "^1.0.0"
     },
     "autoload" : {
         "psr-4" : {
-            "Convo\\Pckg\\Ta\\" : "src/Convo/Pckg/Destiny"
+            "Convo\\Api\\": "src/Convo/Api",
+            "Convo\\Pckg\\Destiny\\" : "src/Convo/Pckg/Destiny"
         }
     },
     "config" : {
