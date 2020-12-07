@@ -16,20 +16,20 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 
     private $_characterId;
 
-	/**
-	 * @var \Convo\Api\CharacterApi;
-	 */
-	private $_characterApi;
+    /**
+     * @var \Convo\Api\CharacterApi;
+     */
+    private $_characterApi;
 
-	/**
-	 * @var \Convo\Api\ItemApi;
-	 */
-	private $_itemApi;
+    /**
+     * @var \Convo\Api\ItemApi;
+     */
+    private $_itemApi;
 
-	/**
-	 * @var \Convo\Core\Util\IHttpFactory
-	 */
-	private $_httpFactory;
+    /**
+     * @var \Convo\Core\Util\IHttpFactory
+     */
+    private $_httpFactory;
 
     public function __construct($properties,  $httpFactory)
     {
