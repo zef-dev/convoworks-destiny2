@@ -15,11 +15,11 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	 */
 	private $_httpFactory;
 
-	public function __construct(\Psr\Log\LoggerInterface $logger, $httpFactory)
+	public function __construct(\Psr\Log\LoggerInterface $logger, \Convo\Core\Util\IHttpFactory $httpFactory)
 	{
-		parent::__construct($logger, self::NAMESPACE, __DIR__);
-
 		$this->_httpFactory = $httpFactory;
+
+		parent::__construct($logger, self::NAMESPACE, __DIR__);
 	}
 
 	public function _initDefintions()
@@ -31,6 +31,27 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				'Initialize Character Element',
 				'Loads a Destiny character and initializes information about them, such as inventory, equipment, stats, etc.',
 				[
+					'scope_type' => [
+						'editor_type' => 'select',
+						'editor_properties' => [
+							'multiple' => false,
+							'options' => [
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+							]
+						],
+						'defaultValue' => 'session',
+						'name' => 'Scope Type',
+						'description' => 'Scope under which to store fetched and initialized character',
+						'valueType' => 'string'
+					],
+					'storage_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Storage Name',
+						'description' => 'Name under which to store fethced data',
+						'valueType' => 'string'
+					],
 					'api_key' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
