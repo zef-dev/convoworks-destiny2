@@ -2,11 +2,11 @@
 
 namespace Convo\Api;
 
-class CharacterApi extends BaseApi
+class CharacterApi extends BaseDestinyApi
 {
-	public function __construct($logger, $httpFactory, $apiKey, $accessToken)
+	public function __construct($httpFactory, $apiKey, $accessToken)
 	{
-		parent::__construct($logger, $httpFactory, $apiKey, $accessToken);
+		parent::__construct($httpFactory, $apiKey, $accessToken);
 	}
 
 	public function getUserProfile($membershipType, $membershipId)
@@ -16,9 +16,9 @@ class CharacterApi extends BaseApi
 		return $this->_performRequest($uri, 'GET');
 	}
 
-	public function getCharacter($membershipType, $membershipId, $characterId)
+	public function getCharacter($membershipType, $membershipId, $characterId, $components)
 	{
-		$uri = parent::BASE_URL . "/Destiny2/$membershipType/Profile/$membershipId/Character/$characterId/?components=200";
+		$uri = parent::BASE_URL . "/Destiny2/$membershipType/Profile/$membershipId/Character/$characterId/?components=".(implode(',', $components));
 
 		return $this->_performRequest($uri, 'GET');
 	}

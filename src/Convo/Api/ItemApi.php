@@ -2,11 +2,11 @@
 
 namespace Convo\Api;
 
-class ItemApi extends BaseApi
+class ItemApi extends BaseDestinyApi
 {
-	public function __construct($logger, $httpFactory, $apiKey, $accessToken)
+	public function __construct($httpFactory, $apiKey, $accessToken)
 	{
-		parent::__construct($logger, $httpFactory, $apiKey, $accessToken);
+		parent::__construct($httpFactory, $apiKey, $accessToken);
 	}
 
 	public function getItemManifest($itemHash)

@@ -4,9 +4,12 @@ namespace Convo\Api;
 
 use Psr\Http\Client\ClientExceptionInterface;
 
-abstract class BaseApi
+abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 {
 	const BASE_URL = 'https://www.bungie.net/Platform';
+
+	const COMPONENT_CHARACTER_INVENTORY = "201";
+	const COMPONENT_CHARACTER_EQUIPMENT = "205";
 
 	/**
 	 * @var \Psr\Log\LoggerInterface
@@ -21,13 +24,18 @@ abstract class BaseApi
 	private $_apiKey;
 	private $_accessToken;
 
-	public function __construct($logger, $httpFactory, $apiKey, $accessToken)
+	public function __construct(\Convo\Core\Util\IHttpFactory $httpFactory, $apiKey, $accessToken)
 	{
-		$this->_logger = $logger;
+		$this->_logger = new \Psr\Log\NullLogger();
 		$this->_httpFactory = $httpFactory;
 
 		$this->_apiKey = $apiKey;
 		$this->_accessToken = $accessToken;
+	}
+
+	public function setLogger(\Psr\Log\LoggerInterface $logger)
+	{
+		$this->_logger = $logger;
 	}
 
 	protected function _performRequest($uri, $method, $body = [])
@@ -39,7 +47,7 @@ abstract class BaseApi
 		try {
 			$response = $client->sendRequest($req);
 
-			$body = json_decode($response->getBody()->__toString());
+			$body = json_decode($response->getBody()->__toString(), true);
 			return $body;
 		} catch (ClientExceptionInterface $e) {
 			$this->_logger->error($e);
