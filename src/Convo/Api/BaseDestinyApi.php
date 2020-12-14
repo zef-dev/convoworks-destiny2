@@ -3,8 +3,6 @@
 namespace Convo\Api;
 
 use Convo\Core\Util\StrUtil;
-use Psr\Http\Client\ClientExceptionInterface;
-
 abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 {
 	const BASE_URL = 'https://www.bungie.net';
@@ -79,7 +77,7 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 
 	protected function _queryManifest($tableName, $id)
 	{
-		$key = $this->_manifests['tables']->{$tableName}[0];
+		$key = $this->_manifests['tables'][$tableName][0];
 
 //		if ($this->_cache->has(StrUtil::slugify($key))) {
 //			return $this->_cache->get(StrUtil::slugify($key));
@@ -105,7 +103,7 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 		while ($row = $result->fetchArray())
 		{
 			$key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-			$results[$key] = json_decode($row[1]);
+			$results[$key] = json_decode($row[1], true);
 		}
 
 		return $results;
