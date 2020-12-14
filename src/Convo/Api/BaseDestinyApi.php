@@ -7,7 +7,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 
 abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 {
-	const BASE_URL = 'https://www.bungie.net/Platform';
+	const BASE_URL = 'https://www.bungie.net';
 
 	const ITEM_TABLE = 'DestinyInventoryItemDefinition';
 

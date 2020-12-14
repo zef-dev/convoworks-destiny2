@@ -60,13 +60,14 @@ class DestinyApiFactory
 
 	private function _initManifest($apiKey)
 	{
-		$url = BaseDestinyApi::BASE_URL . "/Destiny2/Manifest/";
+		$url = BaseDestinyApi::BASE_URL . "/Platform/Destiny2/Manifest/";
 
 		$this->_logger->debug('Fetching manifest from ['.$url.']');
 
 		$client = $this->_httpFactory->getHttpClient();
-		$manifest_request = $this->_httpFactory->buildRequest('GET', $url, [
-			'x-api-key' => $apiKey
+		$manifest_request = $this->_httpFactory->buildRequest('GET', $url,
+		[
+			'Host' => BaseDestinyApi::BASE_URL
 		]);
 
 		$manifest_response = $client->sendRequest($manifest_request);

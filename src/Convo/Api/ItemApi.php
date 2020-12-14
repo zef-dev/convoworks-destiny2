@@ -22,7 +22,7 @@ class ItemApi extends BaseDestinyApi
 	public function getItemInstance($membershipType, $destinyMembershipId, $itemInstanceId)
 	{
 		$this->_logger->debug('Going to get item instance by ID ['.$itemInstanceId.']');
-		$uri = parent::BASE_URL . "/Destiny2/$membershipType/Profile/$destinyMembershipId/Item/$itemInstanceId/?components=300,301,302,303,304,307";
+		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$destinyMembershipId/Item/$itemInstanceId/?components=300,301,302,303,304,307";
 
 		return $this->_performRequest($uri, 'GET');
 	}
