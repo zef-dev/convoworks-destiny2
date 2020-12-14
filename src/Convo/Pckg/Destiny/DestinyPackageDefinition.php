@@ -5,6 +5,7 @@ namespace Convo\Pckg\Destiny;
 use Convo\Core\Factory\AbstractPackageDefinition;
 use Convo\Core\Factory\ComponentDefinition;
 use Convo\Core\Factory\IComponentFactory;
+use Convo\Pckg\Destiny\Catalogs\WeaponNameContext;
 
 class DestinyPackageDefinition extends AbstractPackageDefinition
 {
@@ -129,6 +130,41 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 							return new \Convo\Pckg\Destiny\Elements\InitializeCharacterElement(
 								$properties,
 								$this->_destinyApiFactory
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Catalogs\WeaponNameContext',
+				'Card Name Catalog',
+				'Use a catalog entity for weapon names (currently only available on Amazon Alexa)',
+				[
+					'_preview_angular' => array(
+						'type' => 'html',
+						'template' => '<div class="code">' .
+							'<span class="statement">USE CATALOG ENTITY</span> <b>WeaponName</b>'
+					),
+					'_class_aliases' => ['\Convo\Pckg\Destiny\Catalogs\WeaponNameCatalog'],
+					'_workflow' => 'datasource',
+					'_factory' => new class ($this->_logger, $this->_httpFactory) implements IComponentFactory
+					{
+						private $_logger;
+						private $_httpFactory;
+
+						public function __construct($logger, $httpFactory)
+						{
+							$this->_logger = $logger;
+							$this->_httpFactory = $httpFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new WeaponNameContext(
+								'WeaponNameCatalog',
+								$this->_logger,
+								$this->_httpFactory
 							);
 						}
 					}
