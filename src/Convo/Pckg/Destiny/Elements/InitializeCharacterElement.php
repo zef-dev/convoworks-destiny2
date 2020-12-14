@@ -2,8 +2,9 @@
 
 namespace Convo\Pckg\Destiny\Elements;
 
-use Convo\Api\CharacterApi;
-use Convo\Api\ItemApi;
+use Convo\Api\BaseDestinyApi;
+use Convo\Api\DestinyApiFactory;
+use Convo\Core\Params\IServiceParamsScope;
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 use Convo\Core\Workflow\IConversationElement;
 use Convo\Core\Workflow\IConvoRequest;
@@ -15,24 +16,22 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
     private $_apiKey;
 
     private $_characterId;
+    private $_membershipType;
+    private $_membershipId;
+    private $_initComponents;
 
-    /**
-     * @var \Convo\Api\CharacterApi;
-     */
-    private $_characterApi;
+    private $_scopeType;
+    private $_storageName;
 
-    /**
-     * @var \Convo\Api\ItemApi;
-     */
-    private $_itemApi;
+	/**
+	 * @var \Convo\Api\DestinyApiFactory
+	 */
+	private $_destinyApiFactory;
 
-    /**
-     * @var \Convo\Core\Util\IHttpFactory
-     */
-    private $_httpFactory;
-
-    public function __construct($properties,  $httpFactory)
+    public function __construct($properties, $destinyApiFactory)
     {
+		parent::__construct($properties);
+
         if (!isset($properties['access_token'])) {
             throw new \Exception('Missing access token in element properties.');
         }
@@ -41,14 +40,107 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
             throw new \Exception('Missing API key in element properties.');
         }
 
-        $this->_characterApi = new CharacterApi($this->_logger, $this->_httpFactory, $this->_apiKey, $this->_accessToken);
-        $this->_itemApi = new ItemApi($this->_logger, $this->_httpFactory, $this->_apiKey, $this->_accessToken);
+        $this->_accessToken = $properties['access_token'];
+        $this->_apiKey = $properties['api_key'];
 
         $this->_characterId = $properties['character_id'] ?: '';
+        $this->_membershipType =  $properties['membership_type'] ?: '';
+        $this->_membershipId =  $properties['membership_id'] ?: '';
+        $this->_initComponents = $properties['init_components'] ?: [];
+
+        $this->_scopeType = $properties['scope_type'] ?: IServiceParamsScope::SCOPE_TYPE_SESSION;
+        $this->_storageName = $properties['storage_name'] ?: 'character';
+
+        $this->_destinyApiFactory = $destinyApiFactory;
     }
 
     public function read(IConvoRequest $request, IConvoResponse $response)
     {
-        
+		$params = $this->getService()->getServiceParams($this->_scopeType);
+		$key = $this->evaluateString($this->_storageName);
+
+		if ($params->getServiceParam($key) !== null) { // TODO: store timestamp and check for expiry
+			$this->_logger->debug('Data already set. Will not bust cache yet.');
+			return;
+		}
+
+    	$api_key = $this->evaluateString($this->_apiKey);
+    	$acc_tkn = $this->evaluateString($this->_accessToken);
+
+    	$capi = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
+		$iapi = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
+
+		$mstp = $this->evaluateString($this->_membershipType);
+		$msid = $this->evaluateString($this->_membershipId);
+		$chid = $this->evaluateString($this->_characterId);
+
+        $this->_logger->debug('Going to try to load character ['.$mstp.']['.$msid.']['.$chid.']['.print_r($this->_initComponents, true).']');
+
+        $res = $capi->getCharacter($mstp, $msid, $chid, $this->_initComponents);
+        $character = [];
+
+        if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_INVENTORY, $this->_initComponents)) {
+        	// deserialize inventory
+			$inventory = $res['Response']['inventory']['data']['items'];
+
+			$this->_logger->debug('Going to deserialize ['.count($inventory).'] inventory items');
+
+			$deserialized = [];
+
+			foreach ($inventory as $inventory_item) {
+				try {
+					$item = [];
+
+					$item_manifest = $iapi->getItemManifest($inventory_item['itemHash']);
+					$item['manifest'] = $item_manifest['Response'];
+
+					if (isset($item['itemInstanceId'])) {
+						$instance_data = $iapi->getItemInstance($mstp, $msid, $inventory_item['itemInstanceId']);
+						$item['instance_data'] = $instance_data['Response'];
+					}
+
+					$deserialized[] = $item;
+				} catch (\Exception $e) {
+					$this->_logger->error($e);
+					continue;
+				}
+			}
+
+			$character['inventory'] = $deserialized;
+			$this->_logger->debug('Deserialized ['.count($character['inventory']).'] inventory items');
+		}
+
+        if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_EQUIPMENT, $this->_initComponents)) {
+        	// deserialize equipment
+			$equipment = $res['Response']['equipment']['data']['items'];
+
+			$this->_logger->debug('Going to deserialize ['.count($equipment).'] equipment items');
+
+			$deserialized = [];
+
+			foreach ($equipment as $equipment_item) {
+				try {
+					$item = [];
+
+					$item_manifest = $iapi->getItemManifest($equipment_item['itemHash']);
+					$item['manifest'] = $item_manifest['Response'];
+
+					if (isset($item['itemInstanceId'])) {
+						$instance_data = $iapi->getItemInstance($mstp, $msid, $equipment_item['itemInstanceId']);
+						$item['instance_data'] = $instance_data['Response'];
+					}
+
+					$deserialized[] = $item;
+				} catch (\Exception $e) {
+					$this->_logger->error($e);
+					continue;
+				}
+			}
+
+			$character['equipment'] = $deserialized;
+			$this->_logger->debug('Deserialized ['.count($character['equipment']).'] equipment items');
+		}
+
+        $params->setServiceParam($this->evaluateString($this->_storageName), $character);
     }
 }

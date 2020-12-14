@@ -13,11 +13,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	/**
 	 * @var \Convo\Core\Util\IHttpFactory
 	 */
-	private $_httpFactory;
+	private $_destinyApiFactory;
 
-	public function __construct(\Psr\Log\LoggerInterface $logger, \Convo\Core\Util\IHttpFactory $httpFactory)
+	public function __construct(
+		\Psr\Log\LoggerInterface $logger,
+		\Convo\Api\DestinyApiFactory $destinyApiFactory
+	)
 	{
-		$this->_httpFactory = $httpFactory;
+		$this->_destinyApiFactory = $destinyApiFactory;
 
 		parent::__construct($logger, self::NAMESPACE, __DIR__);
 	}
@@ -112,20 +115,20 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'valueType' => 'string'
 					],
 					'_workflow' => 'read',
-					'_factory' => new class ($this->_httpFactory) implements IComponentFactory
+					'_factory' => new class ($this->_destinyApiFactory) implements IComponentFactory
 					{
-						private $_httpFactory;
+						private $_destinyApiFactory;
 
-						public function __construct($httpFactory)
+						public function __construct($destinyApiFactory)
 						{
-							$this->_httpFactory = $httpFactory;
+							$this->_destinyApiFactory = $destinyApiFactory;
 						}
 
 						public function createComponent($properties, $service)
 						{
 							return new \Convo\Pckg\Destiny\Elements\InitializeCharacterElement(
 								$properties,
-								$this->_httpFactory
+								$this->_destinyApiFactory
 							);
 						}
 					}

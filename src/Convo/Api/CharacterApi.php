@@ -4,9 +4,9 @@ namespace Convo\Api;
 
 class CharacterApi extends BaseDestinyApi
 {
-	public function __construct($httpFactory, $apiKey, $accessToken)
+	public function __construct($httpFactory, $manifests, $cache, $apiKey, $accessToken)
 	{
-		parent::__construct($httpFactory, $apiKey, $accessToken);
+		parent::__construct($httpFactory, $manifests, $cache, $apiKey, $accessToken);
 	}
 
 	public function getUserProfile($membershipType, $membershipId)
