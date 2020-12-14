@@ -91,8 +91,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$item = [];
 
-					$item_manifest = $iapi->getItemManifest($inventory_item['itemHash']);
-					$item['manifest'] = $item_manifest['Response'];
+					$item['manifest'] = $iapi->getItemManifest($inventory_item['itemHash']);
 
 					if (isset($item['itemInstanceId'])) {
 						$instance_data = $iapi->getItemInstance($mstp, $msid, $inventory_item['itemInstanceId']);
@@ -122,8 +121,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$item = [];
 
-					$item_manifest = $iapi->getItemManifest($equipment_item['itemHash']);
-					$item['manifest'] = $item_manifest['Response'];
+					$item['manifest'] = $iapi->getItemManifest($equipment_item['itemHash']);
 
 					if (isset($item['itemInstanceId'])) {
 						$instance_data = $iapi->getItemInstance($mstp, $msid, $equipment_item['itemInstanceId']);
