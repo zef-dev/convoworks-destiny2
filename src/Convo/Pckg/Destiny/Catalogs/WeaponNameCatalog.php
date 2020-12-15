@@ -52,21 +52,7 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
     private function _getAmazonFormattedNames()
     {
-        /** @var \SQLite3 $db */
-        $db = $this->_manifests['db'];
-
-        $results = [];
-        $result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
-        while($row = $result->fetchArray()) {
-            $key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-            $results[$key] = json_decode($row[1], true);
-        }
-
-        $weapons = array_filter($results, function($item) {
-            return in_array($item['inventory']['bucketTypeHash'], [
-                DestinyBucketEnum::BUCKET_KINETIC_WEAPONS, DestinyBucketEnum::BUCKET_ENERGY_WEAPONS, DestinyBucketEnum::BUCKET_POWER_WEAPONS
-            ]);
-        });
+        $weapons = $this->_getWeapons();
 
         $formatted = [
             'values' => array_map(function ($weapon) {
@@ -84,22 +70,34 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
     private function _getDialogflowFormattedNames()
     {
-        /** @var \SQLite3 $db */
-        $db = $this->_manifests['db'];
-
-        $results = [];
-        $result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
-        while($row = $result->fetchArray()) {
-            $key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-            $results[$key] = json_decode($row[1], true);
-        }
-
-        $weapons = array_filter($results, function($item) {
-            return in_array($item['inventory']['bucketTypeHash'], [
-                DestinyBucketEnum::BUCKET_KINETIC_WEAPONS, DestinyBucketEnum::BUCKET_ENERGY_WEAPONS, DestinyBucketEnum::BUCKET_POWER_WEAPONS
-            ]);
-        });
+        $weapons = $this->_getWeapons();
 
         return array_map(function ($weapon) { return $weapon['displayProperties']['name']; }, $weapons);
     }
+
+    private function _getWeapons()
+	{
+		/** @var \SQLite3 $db */
+		$db = $this->_manifests['db'];
+
+		$results = [];
+		$result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
+
+		while ($row = $result->fetchArray()) {
+			$key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
+			$results[$key] = json_decode($row[1], true);
+		}
+
+		$weapons = array_filter($results, function($item) {
+			return in_array($item['inventory']['bucketTypeHash'], [
+				DestinyBucketEnum::BUCKET_KINETIC_WEAPONS,
+				DestinyBucketEnum::BUCKET_ENERGY_WEAPONS,
+				DestinyBucketEnum::BUCKET_POWER_WEAPONS
+			]);
+		});
+
+		$this->_logger->debug('Got ['.count($weapons).'] weapons');
+
+		return $weapons;
+	}
 }
