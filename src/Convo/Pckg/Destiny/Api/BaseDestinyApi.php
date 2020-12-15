@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Convo\Api;
+namespace Convo\Pckg\Destiny\Api;
 
 use Convo\Core\Util\StrUtil;
+
 abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 {
 	const BASE_URL = 'https://www.bungie.net';

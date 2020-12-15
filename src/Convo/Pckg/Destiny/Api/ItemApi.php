@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Convo\Api;
+namespace Convo\Pckg\Destiny\Api;
 
 class ItemApi extends BaseDestinyApi
 {
