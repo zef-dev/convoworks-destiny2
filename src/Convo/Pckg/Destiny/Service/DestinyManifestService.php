@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Convo\Service;
+namespace Convo\Pckg\Destiny\Service;
 
-use Convo\Api\BaseDestinyApi;
+use Convo\Pckg\Destiny\Api\BaseDestinyApi;
 
 class DestinyManifestService
 {
