@@ -14,13 +14,20 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	/**
 	 * @var \Convo\Core\Util\IHttpFactory
 	 */
+	private $_httpFactory;
+
+	/**
+	 * @var \Convo\Core\Util\IHttpFactory
+	 */
 	private $_destinyApiFactory;
 
 	public function __construct(
 		\Psr\Log\LoggerInterface $logger,
+		\Convo\Core\Util\IHttpFactory $httpFactory,
 		\Convo\Api\DestinyApiFactory $destinyApiFactory
 	)
 	{
+		$this->_httpFactory = $httpFactory;
 		$this->_destinyApiFactory = $destinyApiFactory;
 
 		parent::__construct($logger, self::NAMESPACE, __DIR__);
@@ -138,7 +145,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 			new ComponentDefinition(
 				$this->getNamespace(),
 				'\Convo\Pckg\Destiny\Catalogs\WeaponNameContext',
-				'Card Name Catalog',
+				'Weapon Name Catalog',
 				'Use a catalog entity for weapon names (currently only available on Amazon Alexa)',
 				[
 					'_preview_angular' => array(
@@ -147,6 +154,41 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 							'<span class="statement">USE CATALOG ENTITY</span> <b>WeaponName</b>'
 					),
 					'_class_aliases' => ['\Convo\Pckg\Destiny\Catalogs\WeaponNameCatalog'],
+					'_workflow' => 'datasource',
+					'_factory' => new class ($this->_logger, $this->_httpFactory) implements IComponentFactory
+					{
+						private $_logger;
+						private $_httpFactory;
+
+						public function __construct($logger, $httpFactory)
+						{
+							$this->_logger = $logger;
+							$this->_httpFactory = $httpFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new WeaponNameContext(
+								'WeaponNameCatalog',
+								$this->_logger,
+								$this->_httpFactory
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Catalogs\ArmorNameContext',
+				'Armor Name Catalog',
+				'Use a catalog entity for armor names (currently only available on Amazon Alexa)',
+				[
+					'_preview_angular' => array(
+						'type' => 'html',
+						'template' => '<div class="code">' .
+							'<span class="statement">USE CATALOG ENTITY</span> <b>ArmorName</b>'
+					),
+					'_class_aliases' => ['\Convo\Pckg\Destiny\Catalogs\ArmorNameCatalog'],
 					'_workflow' => 'datasource',
 					'_factory' => new class ($this->_logger, $this->_httpFactory) implements IComponentFactory
 					{
