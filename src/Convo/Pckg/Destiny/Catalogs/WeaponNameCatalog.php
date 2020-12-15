@@ -5,7 +5,6 @@ namespace Convo\Pckg\Destiny\Catalogs;
 use Convo\Api\BaseDestinyApi;
 use Convo\Core\Util\StrUtil;
 use Convo\Enums\DestinyBucketEnum;
-use Convo\Service\DestinyManifestService;
 
 class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 {
@@ -36,7 +35,7 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
     public function getCatalogValues($platform)
     {
-        $mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
+        $mservice = new \Convo\Service\DestinyManifestService($this->_logger, $this->_httpFactory);
         $this->_manifests = $mservice->initManifest();
 
         switch ($platform)

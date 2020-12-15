@@ -16,9 +16,6 @@
     },
     "autoload" : {
         "psr-4" : {
-            "Convo\\Api\\": "src/Convo/Api",
-            "Convo\\Enums\\": "src/Convo/Enums",
-            "Convo\\Service\\": "src/Convo/Service",
             "Convo\\Pckg\\Destiny\\" : "src/Convo/Pckg/Destiny"
         }
     },
