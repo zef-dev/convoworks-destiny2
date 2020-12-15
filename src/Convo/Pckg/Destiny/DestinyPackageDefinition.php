@@ -24,7 +24,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	public function __construct(
 		\Psr\Log\LoggerInterface $logger,
 		\Convo\Core\Util\IHttpFactory $httpFactory,
-		\Convo\Api\DestinyApiFactory $destinyApiFactory
+		\Convo\Pckg\Destiny\Api\DestinyApiFactory $destinyApiFactory
 	)
 	{
 		$this->_httpFactory = $httpFactory;
