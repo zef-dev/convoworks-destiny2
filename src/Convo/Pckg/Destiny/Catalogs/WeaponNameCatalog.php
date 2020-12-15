@@ -2,7 +2,7 @@
 
 namespace Convo\Pckg\Destiny\Catalogs;
 
-use Convo\Api\BaseDestinyApi;
+use Convo\Pckg\Destiny\Api\BaseDestinyApi;
 use Convo\Core\Util\StrUtil;
 use Convo\Enums\DestinyBucketEnum;
 
