@@ -77,7 +77,7 @@ class DestinyManifestService
 			}
 		}
 
-		$this->_manifests = [
+		return [
 			'db' => $db,
 			'tables' => $tables
 		];
