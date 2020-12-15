@@ -2,8 +2,8 @@
 
 namespace Convo\Pckg\Destiny\Elements;
 
-use Convo\Api\BaseDestinyApi;
-use Convo\Api\DestinyApiFactory;
+use Convo\Pckg\Destiny\Api\BaseDestinyApi;
+use Convo\Pckg\Destiny\Api\DestinyApiFactory;
 use Convo\Core\Params\IServiceParamsScope;
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 use Convo\Core\Workflow\IConversationElement;
@@ -24,7 +24,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
     private $_storageName;
 
 	/**
-	 * @var \Convo\Api\DestinyApiFactory
+	 * @var \Convo\Pckg\Destiny\Api\DestinyApiFactory
 	 */
 	private $_destinyApiFactory;
 
