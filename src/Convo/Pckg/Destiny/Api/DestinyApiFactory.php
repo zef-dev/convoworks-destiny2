@@ -2,7 +2,7 @@
 
 namespace Convo\Pckg\Destiny\Api;
 
-use Convo\Service\DestinyManifestService;
+use Convo\Pckg\Destiny\Service\DestinyManifestService;
 
 class DestinyApiFactory
 {
