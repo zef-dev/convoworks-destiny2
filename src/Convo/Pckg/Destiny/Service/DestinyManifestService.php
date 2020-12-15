@@ -22,7 +22,7 @@ class DestinyManifestService
         $this->_httpFactory = $httpFactory;    
     }
 
-    public function initManifest()
+    public function initManifest($apiKey)
 	{
 		$url = BaseDestinyApi::BASE_URL . "/Platform/Destiny2/Manifest/";
 
@@ -31,6 +31,7 @@ class DestinyManifestService
 		$client = $this->_httpFactory->getHttpClient();
 		$manifest_request = $this->_httpFactory->buildRequest('GET', $url,
 		[
+			'X-API-key' => $apiKey,
 			'Host' => BaseDestinyApi::BASE_URL
 		]);
 

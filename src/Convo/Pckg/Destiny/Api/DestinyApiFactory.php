@@ -44,7 +44,7 @@ class DestinyApiFactory
 	{
 		if (!$this->_manifests) {
 			$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
-			$this->_manifests = $mservice->initManifest();
+			$this->_manifests = $mservice->initManifest($apiKey);
 		}
 
 		switch ($type) {

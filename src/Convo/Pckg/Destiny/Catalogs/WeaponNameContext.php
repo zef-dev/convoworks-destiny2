@@ -2,12 +2,14 @@
 
 namespace Convo\Pckg\Destiny\Catalogs;
 
-class WeaponNameContext implements \Convo\Core\Workflow\IServiceContext
+use Convo\Core\Workflow\AbstractWorkflowComponent;
+
+class WeaponNameContext extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\IServiceContext
 {
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $_logger;
+    protected $_logger;
 
     /**
      * @var \Convo\Core\Util\IHttpFactory
@@ -21,18 +23,27 @@ class WeaponNameContext implements \Convo\Core\Workflow\IServiceContext
      */
     private $_catalog;
 
-    public function __construct($catalogName, $logger, $httpFactory)
+    private $_apiKey;
+
+    public function __construct($catalogName, $logger, $httpFactory, $properties)
     {
         $this->_componentId = $catalogName;
         
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;
+
+        if (!isset($properties['api_key'])) {
+            throw new \Exception('Missing API key');
+        }
+
+        $this->_apiKey = $properties['api_key'];
     }
 
     public function init()
     {
         $this->_logger->debug('WeaponNameContext init');
-        $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory);
+        $api_key = $this->evaluateString($this->_apiKey);
+        $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory, $api_key);
     }
 
     public function getId()

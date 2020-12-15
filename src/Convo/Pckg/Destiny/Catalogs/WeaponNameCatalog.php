@@ -20,12 +20,15 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
      */
     private $_httpFactory;
 
+    private $_apiKey;
+
     private $_manifests;
 
-    public function __construct($logger, $httpFactory)
+    public function __construct($logger, $httpFactory, $apiKey)
     {
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;
+        $this->_apiKey = $apiKey;
     }
 
     public function getCatalogVersion()
@@ -36,7 +39,7 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
     public function getCatalogValues($platform)
     {
         $mservice = new \Convo\Pckg\Destiny\Service\DestinyManifestService($this->_logger, $this->_httpFactory);
-        $this->_manifests = $mservice->initManifest();
+        $this->_manifests = $mservice->initManifest($this->_apiKey);
 
         switch ($platform)
         {
@@ -54,15 +57,17 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
         $weapons = $this->_getWeapons();
 
         $formatted = [
-            'values' => array_map(function ($weapon) {
-                return [
-                    'id' => StrUtil::slugify($weapon['displayProperties']['name']),
-                    'name' => [
-                        'value' => $weapon['displayProperties']['name']
-                    ]
-                ];
-            }, $weapons)
+            'values' => []
         ];
+
+        $formatted['values'] = array_map(function ($weapon) {
+            return [
+                'id' => StrUtil::slugify($weapon['displayProperties']['name']),
+                'name' => [
+                    'value' => $weapon['displayProperties']['name']
+                ]
+            ];
+        }, $weapons);
 
         return $formatted;
     }
@@ -76,6 +81,8 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
     private function _getWeapons()
 	{
+        $this->_logger->debug('Initializing weapons');
+
 		/** @var \SQLite3 $db */
 		$db = $this->_manifests['db'];
 

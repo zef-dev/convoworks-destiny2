@@ -17,7 +17,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	private $_httpFactory;
 
 	/**
-	 * @var \Convo\Core\Util\IHttpFactory
+	 * @var \Convo\Pckg\Destiny\Api\DestinyApiFactory
 	 */
 	private $_destinyApiFactory;
 
@@ -148,6 +148,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				'Weapon Name Catalog',
 				'Use a catalog entity for weapon names (currently only available on Amazon Alexa)',
 				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
 					'_preview_angular' => array(
 						'type' => 'html',
 						'template' => '<div class="code">' .
@@ -168,10 +176,11 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 
 						public function createComponent($properties, $service)
 						{
-							return new WeaponNameContext(
+							return new \Convo\Pckg\Destiny\Catalogs\WeaponNameContext(
 								'WeaponNameCatalog',
 								$this->_logger,
-								$this->_httpFactory
+								$this->_httpFactory,
+								$properties
 							);
 						}
 					}
@@ -183,6 +192,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				'Armor Name Catalog',
 				'Use a catalog entity for armor names (currently only available on Amazon Alexa)',
 				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
 					'_preview_angular' => array(
 						'type' => 'html',
 						'template' => '<div class="code">' .
@@ -203,10 +220,11 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 
 						public function createComponent($properties, $service)
 						{
-							return new WeaponNameContext(
-								'WeaponNameCatalog',
+							return new \Convo\Pckg\Destiny\Catalogs\ArmorNameContext(
+								'ArmorNameCatalog',
 								$this->_logger,
-								$this->_httpFactory
+								$this->_httpFactory,
+								$properties
 							);
 						}
 					}

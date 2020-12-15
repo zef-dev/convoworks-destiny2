@@ -3,9 +3,9 @@
 namespace Convo\Pckg\Destiny\Catalogs;
 
 use Convo\Pckg\Destiny\Api\BaseDestinyApi;
+use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
+use Convo\Pckg\Destiny\Service\DestinyManifestService;
 use Convo\Core\Util\StrUtil;
-use Convo\Enums\DestinyBucketEnum;
-
 class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 {
 	const CATALOG_VERSION = "1";
@@ -22,10 +22,13 @@ class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
 	private $_manifests;
 
-	public function __construct($logger, $httpFactory)
+	private $_apiKey;
+
+	public function __construct($logger, $httpFactory, $apiKey)
 	{
 		$this->_logger = $logger;
 		$this->_httpFactory = $httpFactory;
+		$this->_apiKey = $apiKey;
 	}
 
 	public function getCatalogVersion()
@@ -35,8 +38,8 @@ class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
 	public function getCatalogValues($platform)
 	{
-		$mservice = new \Convo\Service\DestinyManifestService($this->_logger, $this->_httpFactory);
-		$this->_manifests = $mservice->initManifest();
+		$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
+		$this->_manifests = $mservice->initManifest($this->_apiKey);
 
 		switch ($platform)
 		{
