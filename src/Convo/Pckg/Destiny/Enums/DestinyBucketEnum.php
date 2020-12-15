@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Convo\Enums;
+namespace Convo\Pckg\Destiny\Enums;
 
 abstract class DestinyBucketEnum
 {
