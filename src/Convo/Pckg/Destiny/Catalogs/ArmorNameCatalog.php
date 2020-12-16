@@ -56,6 +56,8 @@ class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 	{
 		$armors = $this->_getArmors();
 
+		// TODO: synonymize names by removing underscores, numbers, definite articles (the), etc.
+
 		$formatted = [
 			'values' => array_map(function ($armor) {
 				return [

@@ -60,6 +60,8 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
             'values' => []
         ];
 
+        // TODO: synonymize names by removing underscores, numbers, definite articles (the), etc.
+
         $formatted['values'] = array_map(function ($weapon) {
             return [
                 'id' => StrUtil::slugify($weapon['displayProperties']['name']),
