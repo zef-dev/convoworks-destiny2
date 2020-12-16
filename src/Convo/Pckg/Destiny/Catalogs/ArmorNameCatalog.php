@@ -54,16 +54,6 @@ class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 
 	private function _getAmazonFormattedNames()
 	{
-		/** @var \SQLite3 $db */
-		$db = $this->_manifests['db'];
-
-		$results = [];
-		$result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
-		while($row = $result->fetchArray()) {
-			$key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-			$results[$key] = json_decode($row[1], true);
-		}
-
 		$armors = $this->_getArmors();
 
 		$formatted = [
