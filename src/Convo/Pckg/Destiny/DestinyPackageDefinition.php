@@ -176,12 +176,15 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 
 						public function createComponent($properties, $service)
 						{
-							return new \Convo\Pckg\Destiny\Catalogs\WeaponNameContext(
+							$ctx = new \Convo\Pckg\Destiny\Catalogs\WeaponNameContext(
 								'WeaponNameCatalog',
 								$this->_logger,
 								$this->_httpFactory,
 								$properties
 							);
+							$ctx->setParent($service);
+							$ctx->setService($service);
+							return $ctx;
 						}
 					}
 				]
@@ -220,12 +223,15 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 
 						public function createComponent($properties, $service)
 						{
-							return new \Convo\Pckg\Destiny\Catalogs\ArmorNameContext(
+							$ctx = new \Convo\Pckg\Destiny\Catalogs\ArmorNameContext(
 								'ArmorNameCatalog',
 								$this->_logger,
 								$this->_httpFactory,
 								$properties
 							);
+							$ctx->setParent($service);
+							$ctx->setService($service);
+							return $ctx;
 						}
 					}
 				]
