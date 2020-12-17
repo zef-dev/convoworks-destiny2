@@ -356,19 +356,21 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
                             'User says: <b>"equip Witherhoard"</b>, <b>"put on Ancient Apocalypse Helm"</b>, <b>"equip my Night Watch"</b>...'.
                             '</div>'
                     ),
-					'_factory' => new class ($this->_packageProviderFactory) implements IComponentFactory
+					'_factory' => new class ($this->_packageProviderFactory, $this->_destinyApiFactory) implements IComponentFactory
 					{
 						private $_packageProviderFactory;
+						private $_destinyApiFactory;
 
-						public function __construct($packageProviderFactory)
+						public function __construct($packageProviderFactory, $destinyApiFactory)
 						{
 							$this->_packageProviderFactory = $packageProviderFactory;
+							$this->_destinyApiFactory = $destinyApiFactory;
 						}
 
 						public function createComponent($properties, $service)
 						{
 							return new \Convo\Pckg\Destiny\Processors\EquipCharacterProcessor(
-								$properties, $this->_packageProviderFactory, $service
+								$properties, $this->_packageProviderFactory, $this->_destinyApiFactory, $service
 							);
 						}
 					}

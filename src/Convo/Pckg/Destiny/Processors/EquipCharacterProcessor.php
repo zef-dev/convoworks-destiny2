@@ -19,6 +19,11 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
      * @var \Convo\Core\Factory\PackageProviderFactory
      */
     private $_packageProviderFactory;
+
+    /**
+     * @var \Convo\Pckg\Destiny\Api\DestinyApiFactory
+     */
+    private $_destinyApiFactory;
     
     /**
 	 * @var \Convo\Core\Workflow\IConversationElement[]
@@ -40,12 +45,14 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 	 */
     private $_nok;
 
-    public function __construct($properties, $packageProviderFactory, $service)
+    public function __construct($properties, $packageProviderFactory, $destinyApiFactory, $service)
     {
         parent::__construct($properties);
         $this->setService($service);
 
         $this->_packageProviderFactory = $packageProviderFactory;
+
+        $this->_destinyApiFactory = $destinyApiFactory;
 
         $this->_preEquip = $properties['pre_equip'] ?: [];
         foreach ($this->_preEquip as $pre_equip) {
