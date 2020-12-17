@@ -5,7 +5,6 @@ namespace Convo\Pckg\Destiny;
 use Convo\Core\Factory\AbstractPackageDefinition;
 use Convo\Core\Factory\ComponentDefinition;
 use Convo\Core\Factory\IComponentFactory;
-use Convo\Pckg\Destiny\Catalogs\WeaponNameContext;
 
 class DestinyPackageDefinition extends AbstractPackageDefinition
 {
@@ -17,6 +16,11 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	private $_httpFactory;
 
 	/**
+	 * @var \Convo\Core\Factory\PackageProviderFactory
+	 */
+	private $_packageProviderFactory;
+
+	/**
 	 * @var \Convo\Pckg\Destiny\Api\DestinyApiFactory
 	 */
 	private $_destinyApiFactory;
@@ -24,13 +28,20 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	public function __construct(
 		\Psr\Log\LoggerInterface $logger,
 		\Convo\Core\Util\IHttpFactory $httpFactory,
+		\Convo\Core\Factory\PackageProviderFactory $packageProviderFactory,
 		\Convo\Pckg\Destiny\Api\DestinyApiFactory $destinyApiFactory
 	)
 	{
 		$this->_httpFactory = $httpFactory;
+		$this->_packageProviderFactory = $packageProviderFactory;
 		$this->_destinyApiFactory = $destinyApiFactory;
 
 		parent::__construct($logger, self::NAMESPACE, __DIR__);
+	}
+
+	protected function _initIntents()
+	{
+		return $this->_loadIntents(__DIR__.'/system-intents.json');
 	}
 
 	public function _initDefintions()
@@ -137,6 +148,227 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 							return new \Convo\Pckg\Destiny\Elements\InitializeCharacterElement(
 								$properties,
 								$this->_destinyApiFactory
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Elements\ItemInstanceElement',
+				'Item Instance Element',
+				'Takes an item instance ID (or IDs), and deserializes them to make them available to use in the service\'s scope',
+				[
+					'scope_type' => [
+						'editor_type' => 'select',
+						'editor_properties' => [
+							'multiple' => false,
+							'options' => [
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+							]
+						],
+						'defaultValue' => 'session',
+						'name' => 'Scope Type',
+						'description' => 'Scope under which to store item instances',
+						'valueType' => 'string'
+					],
+					'storage_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Storage Name',
+						'description' => 'Name under which to store data',
+						'valueType' => 'string'
+					],
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
+					'access_token' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Access Token',
+						'description' => 'Access token needed to identify requests that need OAuth authorization',
+						'valueType' => 'string'
+					],
+					'membership_type' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership Type',
+						'description' => 'The platform to load these items on. Possible values are 1 = Xbox, 2 = Playstation, 3 = Steam, 5 = Stadia',
+						'valueType' => 'string'
+					],
+					'membership_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership ID',
+						'description' => 'Membership ID for the chosen profile',
+						'valueType' => 'string'
+					],
+					'character_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character ID',
+						'description' => 'Character ID that you wish to manage equipment for',
+						'valueType' => 'string'
+					],
+					'item_instance_ids' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Item Instance IDs',
+						'description' => 'One or more item instace IDs to deserialize',
+						'valueType' => 'string'
+					],
+					'_workflow' => 'read',
+					'_preview_angular' => [
+						'type' => 'html',
+						'type' => 'html',
+						'template' => '<div class="code">' .
+							'<span class="statement">DESERIALIZE ITEM INSTANCES</span> <b>{{ component.properties.item_instance_ids }}</b>'
+					],
+					'_factory' => new class ($this->_destinyApiFactory) implements IComponentFactory
+					{
+						private $_destinyApiFactory;
+
+						public function __construct($destinyApiFactory)
+						{
+							$this->_destinyApiFactory = $destinyApiFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new \Convo\Pckg\Destiny\Elements\ItemInstanceElement($properties, $this->_destinyApiFactory);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Processors\EquipCharacterProcessor',
+				'Equip Character Processor',
+				'Equip weapons, armor, and other items from your inventory to your character.',
+				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
+					'access_token' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Access Token',
+						'description' => 'Access token needed to identify requests that need OAuth authorization',
+						'valueType' => 'string'
+					],
+					'membership_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership ID',
+						'description' => 'Membership ID for the chosen profile',
+						'valueType' => 'string'
+					],
+					'character_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character ID',
+						'description' => 'Character ID that you wish to manage equipment for',
+						'valueType' => 'string'
+					],
+					'inventory' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character inventory',
+						'description' => 'Collection of items in the character\'s inventory. At minimum, equippable items need to have a name attribute and an item instance ID',
+						'valueType' => 'string'
+					],
+					'pre_equip' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'Pre-Equip',
+						'description' => 'Runs when before the equipping process starts',
+						'valueType' => 'class'
+					],
+					'ok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'OK',
+						'description' => 'Runs when a given item has been sucessfully equipped',
+						'valueType' => 'class'
+					],
+					'multiple_found' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Duplicates Found',
+						'description' => 'Runs when multiple items with the same name have been found',
+						'valueType' => 'class'
+					],
+					'nok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Not OK',
+						'description' => 'Runs when the given item could not be equipped',
+						'valueType' => 'class'
+					],
+					'_workflow' => 'process',
+					'_preview_angular' => array(
+                        'type' => 'html',
+                        'template' => '<div class="user-say">'.
+                            'User says: <b>"equip Witherhoard"</b>, <b>"put on Ancient Apocalypse Helm"</b>, <b>"equip my Night Watch"</b>...'.
+                            '</div>'
+                    ),
+					'_factory' => new class ($this->_packageProviderFactory) implements IComponentFactory
+					{
+						private $_packageProviderFactory;
+
+						public function __construct($packageProviderFactory)
+						{
+							$this->_packageProviderFactory = $packageProviderFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new \Convo\Pckg\Destiny\Processors\EquipCharacterProcessor(
+								$properties, $this->_packageProviderFactory, $service
 							);
 						}
 					}
