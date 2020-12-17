@@ -1,0 +1,129 @@
+{
+    "EquipWeaponIntent": [
+        {
+            "platforms": ["amazon", "dialogflow"],
+            "definition": {
+                "name": "EquipWeaponIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "put on Falling Guillotine",
+                        "model": [
+                            {
+                                "text": "put on"
+                            },
+                            {
+                                "text": "Falling Guillotine",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip Witherhoard",
+                        "model": [
+                            {
+                                "text": "equip"
+                            },
+                            {
+                                "text": "Witherhoard",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on my Seventh Seraph Officer Revolver",
+                        "model": [
+                            {
+                                "text": "put on my"
+                            },
+                            {
+                                "text": "Seventh Seraph Officer Revolver",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip my Patron of Lost Causes",
+                        "model": [
+                            {
+                                "text": "equip my"
+                            },
+                            {
+                                "text": "Patron of Lost Causes",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "EquipArmorIntent": 
+    [
+        {
+            "platforms": ["amazon", "dialogflow"],
+            "definition": {
+                "name": "EquipArmorIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "put on Iron Will Bond",
+                        "model": [
+                            {
+                                "text": "put on"
+                            },
+                            {
+                                "text": "Iron Will Bond",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip Ophidian Aspect",
+                        "model": [
+                            {
+                                "text": "equip"
+                            },
+                            {
+                                "text": "Ophidian Aspect",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on my Heiro Camo",
+                        "model": [
+                            {
+                                "text": "put on my"
+                            },
+                            {
+                                "text": "Heiro Camo",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip my Wild Hunt Vestment",
+                        "model": [
+                            {
+                                "text": "equip my"
+                            },
+                            {
+                                "text": "Wild Hunt Vestment",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
