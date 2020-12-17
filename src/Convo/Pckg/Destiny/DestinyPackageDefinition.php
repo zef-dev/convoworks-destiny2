@@ -323,7 +323,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Runs when a given item has been sucessfully equipped',
 						'valueType' => 'class'
 					],
-					'multiple_found' => [
+					'duplicates_found' => [
 						'editor_type' => 'service_components',
 						'editor_properties' => [
 							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
@@ -333,7 +333,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'defaultValue' => [],
 						'defaultOpen' => false,
 						'name' => 'Duplicates Found',
-						'description' => 'Runs when multiple items with the same name have been found',
+						'description' => 'Runs when duplicate items with the same name have been found. Will not equip anything.',
 						'valueType' => 'class'
 					],
 					'nok' => [

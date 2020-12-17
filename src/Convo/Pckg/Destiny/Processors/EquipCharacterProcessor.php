@@ -9,6 +9,7 @@ use Convo\Core\Workflow\IRequestFilterResult;
 use Convo\Pckg\Core\Filters\ConvoIntentReader;
 use Convo\Pckg\Core\Filters\IntentRequestFilter;
 use Convo\Pckg\Core\Processors\AbstractServiceProcessor;
+use Convo\Pckg\Destiny\Api\DestinyApiFactory;
 
 /**
  * This processor equips items from the character's inventory onto the character itself
@@ -38,12 +39,15 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
     /**
 	 * @var \Convo\Core\Workflow\IConversationElement[]
 	 */
-    private $_multipleFound;
+    private $_duplicatesFound;
     
     /**
 	 * @var \Convo\Core\Workflow\IConversationElement[]
 	 */
     private $_nok;
+
+    private $_duplicateItemsScope;
+    private $_duplicateItemsName;
 
     public function __construct($properties, $packageProviderFactory, $destinyApiFactory, $service)
     {
@@ -64,15 +68,18 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             $this->addChild($ok);
         }
 
-        $this->_multipleFound = $properties['multiple_found'] ?: [];
-        foreach ($this->_multipleFound as $mf) {
-            $this->addChild($mf);
+        $this->_duplicatesFound = $properties['duplicates_found'] ?: [];
+        foreach ($this->_duplicatesFound as $df) {
+            $this->addChild($df);
         }
 
         $this->_nok = $properties['nok'] ?: [];
         foreach ($this->_nok as $nok) {
             $this->addChild($nok);
         }
+
+        $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
+        $this->_duplicateItemsName = $properties['duplicate_items_name'] ?: 'duplicate_items';
 
         $this->_requestFilters = $this->_initFilters();
     }
@@ -116,10 +123,62 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             $pre_equip->read($request, $response);
         }
 
+        $character_api = $this->_destinyApiFactory->getApi(
+            DestinyApiFactory::API_TYPE_CHARACTER,
+            $this->evaluateString($this->_apiKey),
+            $this->evaluateString($this->_accessToken)
+        );
+
+        $char_id = $this->evaluateString($this->_characterId);
+        $membership_type = $this->evaluateString($this->_membershipType);
+
         if ($sys_intent->getName() === 'EquipWeaponIntent')
         {
             $this->_logger->debug('Handling EquipWeaponIntent');
-            return;
+            
+            // find item
+            $weapon_name = $result->getSlotValue('WeaponName');
+
+            $item_ids = [''];
+
+            if (count($item_ids) > 1)
+            {
+                // duplicate items with the same name found
+                $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+
+                $name = $this->evaluateString($this->_duplicateItemsName);
+                $this->_logger->debug('Going to store duplicate item IDs ['.implode(', ', $item_ids).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
+                
+                $params->setServiceParam($name, $item_ids);
+
+                foreach ($this->_duplicatesFound as $df) {
+                    $df->read($request, $response);
+                }
+
+                return;
+            }
+            else if (count($item_ids) === 1)
+            {
+                // one item found, equip it
+                $character_api->equipItems(
+                    $item_ids, $char_id, $membership_type
+                );
+
+                foreach ($this->_ok as $ok) {
+                    $ok->read($request, $response);
+                }
+
+                return;
+            }
+            else
+            {
+                // none found
+                foreach ($this->_nok as $nok) {
+                    $nok->read($request, $response);
+                }
+                
+                return;
+            }
         }
 
         if ($sys_intent->getName() === 'EquipArmorIntent')
