@@ -25,17 +25,21 @@ class CharacterApi extends BaseDestinyApi
 
 	public function equipItems($itemIds, $characterId, $membershipType)
 	{
-		$uri = parent::BASE_URL . '/Platform/Destiny2/Actions/Items/EquipItem/';
+		$uri = parent::BASE_URL . '/Platform/Destiny2/Actions/Items/EquipItems/';
 
 		if (!is_array($itemIds)) {
-			$itemsIds = [$itemIds];
+			$itemIds = [$itemIds];
 		}
 
+		$itemIds = array_map(function ($id) { return (int) $id; }, $itemIds);
+
 		$body = [
-			"itemIds" => $itemsIds,
+			"itemIds" => $itemIds,
 			"characterId" => $characterId,
 			"membershipType" => $membershipType
 		];
+
+		$this->_logger->debug('Going to POST EquipItems with ['.print_r($body, true).']');
 
 		return $this->_performRequest($uri, 'POST', $body);
 	}
