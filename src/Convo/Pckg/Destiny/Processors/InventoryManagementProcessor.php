@@ -13,7 +13,7 @@ use Convo\Pckg\Core\Processors\AbstractServiceProcessor;
  */
 class InventoryManagementProcessor extends AbstractServiceProcessor implements IConversationProcessor
 {
-    public function __construct($properties)
+    public function __construct($properties, $packageProviderFactory, $destinyApiFactory, $service)
     {
         
     }
