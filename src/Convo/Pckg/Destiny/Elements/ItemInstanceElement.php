@@ -54,6 +54,7 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         $api_key = $this->evaluateString($this->_apiKey);
         $acc_tkn = $this->evaluateString($this->_accessToken);
 
+        /** @var \Convo\Pckg\Destiny\Api\ItemApi $item_api */
         $item_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
 
         $item_ids = $this->evaluateString($this->_itemInstanceIds);
@@ -66,6 +67,12 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
                 $this->evaluateString($this->_membershipType),
                 $this->evaluateString($this->_membershipId),
                 $item_id);
+
+            foreach ($instance['Response']['perks']['data']['perks'] as &$perk)
+            {
+                $perk_definition = $item_api->getPerkManifest($perk['perkHash']);
+                $perk['name'] = $perk_definition['Response']['displayProperties']['name'];
+            }
 
             $instances[] = new \Convo\Pckg\Destiny\ItemInstance($instance['Response']);
         }

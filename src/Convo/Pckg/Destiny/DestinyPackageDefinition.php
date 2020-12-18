@@ -212,14 +212,6 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Membership ID for the chosen profile',
 						'valueType' => 'string'
 					],
-					'character_id' => [
-						'editor_type' => 'text',
-						'editor_properties' => [],
-						'defaultValue' => null,
-						'name' => 'Character ID',
-						'description' => 'Character ID that you wish to manage equipment for',
-						'valueType' => 'string'
-					],
 					'item_instance_ids' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
@@ -399,6 +391,27 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'defaultValue' => null,
 						'name' => 'Character inventory',
 						'description' => 'Collection of items in the character\'s inventory. At minimum, equippable items need to have a name attribute and an item instance ID',
+						'valueType' => 'string'
+					],
+					'duplicate_items_scope' => [
+						'editor_type' => 'select',
+						'editor_properties' => [
+							'multiple' => false,
+							'options' => [
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+							]
+						],
+						'defaultValue' => 'session',
+						'name' => 'Duplicate Items Scope',
+						'description' => 'Scope under which to store duplicate item instance IDs, if found',
+						'valueType' => 'string'
+					],
+					'duplicate_items_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Storage Name',
+						'description' => 'Name under which to store duplicate item instance IDs',
 						'valueType' => 'string'
 					],
 					'pre_equip' => [

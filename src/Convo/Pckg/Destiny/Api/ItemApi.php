@@ -26,4 +26,14 @@ class ItemApi extends BaseDestinyApi
 
 		return $this->_performRequest($uri, 'GET');
 	}
+
+	public function getPerkManifest($perkHash)
+	{
+		$this->_logger->debug('Going to get perk manifest with hash ['.$perkHash.']');
+
+		$res = $this->_queryManifest(BaseDestinyApi::PERK_TABLE, $perkHash);
+		
+		$this->_logger->debug('Got perk manifest ['.print_r($res, true).']');
+		return $res;
+	}
 }
