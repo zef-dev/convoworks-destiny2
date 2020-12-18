@@ -2,6 +2,8 @@
     "namespace": "convo-destiny",
     "author": "ZEF Development",
     "email": "marko@zefdev.com",
-    "source_for": [],
+    "source_for": [
+        "intents"
+    ],
     "description": "Interact with and manipulate Bungie's Destiny 2 API."
 }
