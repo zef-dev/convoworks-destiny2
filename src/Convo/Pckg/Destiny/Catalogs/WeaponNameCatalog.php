@@ -8,7 +8,7 @@ use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 
 class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 {
-    const CATALOG_VERSION = "1";
+    const CATALOG_VERSION = "2";
 
     /**
      * @var \Psr\Log\LoggerInterface
@@ -61,17 +61,26 @@ class WeaponNameCatalog implements \Convo\Core\Workflow\ICatalogSource
         ];
 
         // TODO: synonymize names by removing underscores, numbers, definite articles (the), etc.
-
         $formatted['values'] = array_map(function ($weapon) {
             return [
                 'id' => StrUtil::slugify($weapon['displayProperties']['name']),
                 'name' => [
                     'value' => $weapon['displayProperties']['name']
-                ]
+                ],
+                'synonyms' => $this->_nameToSynonyms($weapon['displayProperties']['name'])
             ];
         }, $weapons);
 
         return $formatted;
+    }
+
+    private function _nameToSynonyms($name)
+    {
+        $return = [$name];
+
+        $return[] = str_ireplace(['the', '-', '.'], '', $name);
+
+        return $return;
     }
 
     private function _getDialogflowFormattedNames()
