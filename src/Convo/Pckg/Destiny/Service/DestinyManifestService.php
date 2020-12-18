@@ -38,23 +38,29 @@ class DestinyManifestService
 		$manifest_response = $client->sendRequest($manifest_request);
 
 		$en_manifest_db_path = json_decode($manifest_response->getBody()->__toString())->Response->mobileWorldContentPaths->en;
-
-		$this->_logger->debug('Got manifest, fetching en path ['.$en_manifest_db_path.']');
-
-		$en_manifest_db_req = $this->_httpFactory->buildRequest(
-			'GET',
-			BaseDestinyApi::BASE_URL.$en_manifest_db_path
-		);
-
-		$en_manifest_db_res = $client->sendRequest($en_manifest_db_req);
-
 		$cacheFilePath = 'cache/'.pathinfo($en_manifest_db_path, PATHINFO_BASENAME);
 
-		if (!file_exists(dirname($cacheFilePath))) {
-			mkdir(dirname($cacheFilePath), 0777, true);
+		if (file_exists($cacheFilePath.'.zip'))
+		{
+			$this->_logger->warning('No need to redownload manifest');
 		}
+		else
+		{
+			$this->_logger->debug('Got manifest, fetching en path ['.$en_manifest_db_path.']');
 
-		file_put_contents($cacheFilePath.'.zip', $en_manifest_db_res->getBody()->__toString());
+			$en_manifest_db_req = $this->_httpFactory->buildRequest(
+				'GET',
+				BaseDestinyApi::BASE_URL.$en_manifest_db_path
+			);
+	
+			$en_manifest_db_res = $client->sendRequest($en_manifest_db_req);
+	
+			if (!file_exists(dirname($cacheFilePath))) {
+				mkdir(dirname($cacheFilePath), 0777, true);
+			}
+	
+			file_put_contents($cacheFilePath.'.zip', $en_manifest_db_res->getBody()->__toString());
+		}
 
 		$zip = new \ZipArchive();
 		if ($zip->open($cacheFilePath.'.zip') === TRUE) {
