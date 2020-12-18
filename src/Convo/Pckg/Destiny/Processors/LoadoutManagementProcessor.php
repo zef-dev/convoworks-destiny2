@@ -15,6 +15,14 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         
     }
 
-    public function process(IConvoRequest $request, IConvoResponse $response, IRequestFilterResult $result) { }
+    private function _initFilters()
+    {
+        
+    }
+
+    public function process(IConvoRequest $request, IConvoResponse $response, IRequestFilterResult $result)
+    {
+        
+    }
     
 }
