@@ -98,11 +98,11 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 
     private function _initFilters()
     {
-        $equip_weapon_reader = new ConvoIntentReader(['intent' => 'convo-destiny2.EquipWeaponIntent'], $this->_packageProviderFactory);
+        $equip_weapon_reader = new ConvoIntentReader(['intent' => 'convo-destiny.EquipWeaponIntent'], $this->_packageProviderFactory);
         $equip_weapon_reader->setLogger($this->_logger);
         $equip_weapon_reader->setService($this->getService());
 
-        $equip_armor_reader = new ConvoIntentReader(['intent' => 'convo-destiny2.EquipArmorIntent'], $this->_packageProviderFactory);
+        $equip_armor_reader = new ConvoIntentReader(['intent' => 'convo-destiny.EquipArmorIntent'], $this->_packageProviderFactory);
         $equip_armor_reader->setLogger($this->_logger);
         $equip_armor_reader->setService($this->getService());
 
@@ -151,7 +151,7 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             $item_ids = [];
 
             foreach ($inventory as $item) {
-                if ($item['manifest_data']['displayProperties']['name'] === $weapon_name) {
+                if (strtolower($item['manifest']['displayProperties']['name']) === strtolower($weapon_name)) {
                     $item_ids[] = $item['base']['itemInstanceId'];
                 }
             }
@@ -174,12 +174,15 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             }
             else if (count($item_ids) === 1)
             {
+                $this->_logger->debug('One item found. Equipping.');
                 try {
                     // one item found, equip it
                     $character_api->equipItems(
                         $item_ids, $char_id, $membership_type
                     );
 
+                    $this->_logger->debug('Item equipped. Reading OK flow.');
+                    
                     foreach ($this->_ok as $ok) {
                         $ok->read($request, $response);
                     }
