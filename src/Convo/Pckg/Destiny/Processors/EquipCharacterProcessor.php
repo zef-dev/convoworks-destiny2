@@ -25,11 +25,6 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
      * @var \Convo\Pckg\Destiny\Api\DestinyApiFactory
      */
     private $_destinyApiFactory;
-    
-    /**
-	 * @var \Convo\Core\Workflow\IConversationElement[]
-	 */
-    private $_preEquip;
 
     /**
 	 * @var \Convo\Core\Workflow\IConversationElement[]
@@ -52,7 +47,7 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
     private $_membershipType;
     private $_characterId;
 
-    private $_characterInventory;
+    private $_inventory;
 
     private $_duplicateItemsScope;
     private $_duplicateItemsName;
@@ -75,11 +70,6 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $this->_packageProviderFactory = $packageProviderFactory;
         $this->_destinyApiFactory = $destinyApiFactory;
 
-        $this->_preEquip = $properties['pre_equip'] ?: [];
-        foreach ($this->_preEquip as $pre_equip) {
-            $this->addChild($pre_equip);
-        }
-
         $this->_ok = $properties['ok'] ?: [];
         foreach ($this->_ok as $ok) {
             $this->addChild($ok);
@@ -98,7 +88,7 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $this->_characterId = $properties['character_id'];
         $this->_membershipType = $properties['membership_type'];
 
-        $this->_characterInventory = $properties['character_inventory'];
+        $this->_inventory = $properties['inventory'];
 
         $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
         $this->_duplicateItemsName = $properties['duplicate_items_name'] ?: 'duplicate_items';
@@ -139,11 +129,6 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $sys_intent = $provider->findPlatformIntent($request->getIntentName(), $request->getPlatformId());
 
         $this->_logger->debug('Got sys intent ['.$sys_intent->getName().']['.$sys_intent.']');
-        
-        foreach ($this->_preEquip as $pre_equip)
-        {
-            $pre_equip->read($request, $response);
-        }
 
         $character_api = $this->_destinyApiFactory->getApi(
             DestinyApiFactory::API_TYPE_CHARACTER,
@@ -161,10 +146,9 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             // find item
             $weapon_name = $result->getSlotValue('WeaponName');
 
-            $item_ids = [];
-
             /** @var array $inventory */
-            $inventory = $this->evaluateString($this->_characterInventory);
+            $inventory = $this->evaluateString($this->_inventory);
+            $item_ids = [];
 
             foreach ($inventory as $item) {
                 if ($item['manifest_data']['displayProperties']['name'] === $weapon_name) {

@@ -414,19 +414,6 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Name under which to store duplicate item instance IDs',
 						'valueType' => 'string'
 					],
-					'pre_equip' => [
-						'editor_type' => 'service_components',
-						'editor_properties' => [
-							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
-							'multiple' => true,
-							'hideWhenEmpty' => false
-						],
-						'defaultValue' => [],
-						'defaultOpen' => true,
-						'name' => 'Pre-Equip',
-						'description' => 'Runs when before the equipping process starts',
-						'valueType' => 'class'
-					],
 					'ok' => [
 						'editor_type' => 'service_components',
 						'editor_properties' => [
