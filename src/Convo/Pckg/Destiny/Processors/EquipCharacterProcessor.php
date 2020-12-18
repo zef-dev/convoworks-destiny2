@@ -46,6 +46,12 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 	 */
     private $_nok;
 
+    private $_apiKey;
+    private $_accessToken;
+
+    private $_membershipType;
+    private $_characterId;
+
     private $_duplicateItemsScope;
     private $_duplicateItemsName;
 
@@ -54,8 +60,17 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         parent::__construct($properties);
         $this->setService($service);
 
-        $this->_packageProviderFactory = $packageProviderFactory;
+        if (!isset($properties['api_key'])) {
+            throw new \Exception('Missing API key');
+        }
+        $this->_apiKey = $properties['api_key'];
 
+        if (!isset($properties['access_token'])) {
+            throw new \Exception('Missing access token');
+        }
+        $this->_accessToken = $properties['access_token'];
+
+        $this->_packageProviderFactory = $packageProviderFactory;
         $this->_destinyApiFactory = $destinyApiFactory;
 
         $this->_preEquip = $properties['pre_equip'] ?: [];
@@ -77,6 +92,9 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         foreach ($this->_nok as $nok) {
             $this->addChild($nok);
         }
+
+        $this->_characterId = $properties['character_id'];
+        $this->_membershipType = $properties['membership_type'];
 
         $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
         $this->_duplicateItemsName = $properties['duplicate_items_name'] ?: 'duplicate_items';
