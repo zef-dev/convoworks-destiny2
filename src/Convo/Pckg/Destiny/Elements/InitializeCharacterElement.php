@@ -91,14 +91,8 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$item = [];
 
+					$item['base'] = $inventory_item;
 					$item['manifest'] = $iapi->getItemManifest($inventory_item['itemHash']);
-
-					if (isset($inventory_item['itemInstanceId'])) {
-						// $instance_data = $iapi->getItemInstance($mstp, $msid, $inventory_item['itemInstanceId']);
-						// $item['instance_data'] = $instance_data['Response'];
-						$this->_logger->debug('Inventory item has instance ID ['.$inventory_item['itemInstanceId'].']. Storing for future use.');
-						$item['itemInstanceId'] = $inventory_item['itemInstanceId'];
-					}
 
 					$deserialized[] = $item;
 				} catch (\Exception $e) {
@@ -123,13 +117,8 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$item = [];
 
+					$item['base'] = $equipment_item;
 					$item['manifest'] = $iapi->getItemManifest($equipment_item['itemHash']);
-
-					if (isset($equipment_item['itemInstanceId'])) {
-						// $instance_data = $iapi->getItemInstance($mstp, $msid, $equipment_item['itemInstanceId']);
-						// $item['instance_data'] = $instance_data['Response'];
-						$item['itemInstanceId'] = $equipment_item['itemInstanceId'];
-					}
 
 					$deserialized[] = $item;
 				} catch (\Exception $e) {
