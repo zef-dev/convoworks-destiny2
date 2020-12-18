@@ -8,7 +8,7 @@ use Convo\Pckg\Destiny\Service\DestinyManifestService;
 use Convo\Core\Util\StrUtil;
 class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 {
-	const CATALOG_VERSION = "1";
+	const CATALOG_VERSION = "2";
 
 	/**
 	 * @var \Psr\Log\LoggerInterface
