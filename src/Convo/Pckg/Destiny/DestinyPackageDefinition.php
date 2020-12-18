@@ -253,6 +253,110 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 			),
 			new ComponentDefinition(
 				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Elements\EquipItemElement',
+				'Equip Item Element',
+				'Equips an item to a given character',
+				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
+					'access_token' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Access Token',
+						'description' => 'Access token needed to identify requests that need OAuth authorization',
+						'valueType' => 'string'
+					],
+					'membership_type' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership Type',
+						'description' => 'Membership type for the chosen profile',
+						'valueType' => 'string'
+					],
+					'character_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character ID',
+						'description' => 'Character ID that you wish to manage equipment for',
+						'valueType' => 'string'
+					],
+					'item_instance_ids' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Item Instance ID',
+						'description' => 'Item instace ID to equip',
+						'valueType' => 'string'
+					],
+					'pre_equip' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'Pre-Equip',
+						'description' => 'Runs when before the equipping process starts',
+						'valueType' => 'class'
+					],
+					'ok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'OK',
+						'description' => 'Runs when a given item has been sucessfully equipped',
+						'valueType' => 'class'
+					],
+					'nok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Not OK',
+						'description' => 'Runs when the given item could not be equipped',
+						'valueType' => 'class'
+					],
+					'_workflow' => 'read',
+					'_factory' => new class ($this->_destinyApiFactory) implements IComponentFactory
+					{
+						private $_destinyApiFactory;
+
+						public function __construct($destinyApiFactory)
+						{
+							$this->_destinyApiFactory = $destinyApiFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new \Convo\Pckg\Destiny\Elements\EquipItemElement(
+								$properties, $this->_destinyApiFactory
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
 				'\Convo\Pckg\Destiny\Processors\EquipCharacterProcessor',
 				'Equip Character Processor',
 				'Equip weapons, armor, and other items from your inventory to your character.',

@@ -20,6 +20,11 @@ class EquipItemElement extends AbstractWorkflowContainerComponent implements ICo
     /**
      * @var IConversationElement[]
      */
+    private $_preEquip;
+
+    /**
+     * @var IConversationElement[]
+     */
     private $_ok;
 
     /**
@@ -37,6 +42,11 @@ class EquipItemElement extends AbstractWorkflowContainerComponent implements ICo
     public function __construct($properties, $destinyApiFactory)
     {
         $this->_destinyApiFactory = $destinyApiFactory;
+
+        $this->_preEquip = $properties['pre_equip'] ?: [];
+        foreach ($this->_preEquip as $preq) {
+            $this->addChild($preq);
+        }
 
         $this->_ok = $properties['ok'] ?: [];
         foreach ($this->_ok as $ok) {
@@ -73,10 +83,14 @@ class EquipItemElement extends AbstractWorkflowContainerComponent implements ICo
 
         $item_id = $this->evaluateString($this->_itemInstanceId);
         
+        foreach ($this->_preEquip as $preq) {
+            $preq->read($request, $response);
+        }
+
         try
         {
             $character_api->equipItems(
-                [$item_id],
+                $item_id,
                 $this->evaluateString($this->_characterId),
                 $this->evaluateString($this->_membershipType)
             );
