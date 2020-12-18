@@ -281,7 +281,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Character ID that you wish to manage equipment for',
 						'valueType' => 'string'
 					],
-					'item_instance_ids' => [
+					'item_instance_id' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
