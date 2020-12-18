@@ -174,16 +174,24 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             }
             else if (count($item_ids) === 1)
             {
-                // one item found, equip it
-                $character_api->equipItems(
-                    $item_ids, $char_id, $membership_type
-                );
+                try {
+                    // one item found, equip it
+                    $character_api->equipItems(
+                        $item_ids, $char_id, $membership_type
+                    );
 
-                foreach ($this->_ok as $ok) {
-                    $ok->read($request, $response);
+                    foreach ($this->_ok as $ok) {
+                        $ok->read($request, $response);
+                    }
+                } catch (\Exception $e) {
+                    $this->_logger->error($e);
+
+                    foreach ($this->_nok as $nok) {
+                        $nok->read($request, $response);
+                    }
+                } finally {
+                    return;
                 }
-
-                return;
             }
             else
             {
