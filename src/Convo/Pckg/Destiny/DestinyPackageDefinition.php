@@ -377,12 +377,12 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Access token needed to identify requests that need OAuth authorization',
 						'valueType' => 'string'
 					],
-					'membership_id' => [
+					'membership_type' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
-						'name' => 'Membership ID',
-						'description' => 'Membership ID for the chosen profile',
+						'name' => 'Membership Type',
+						'description' => 'Membership type for the chosen profile',
 						'valueType' => 'string'
 					],
 					'character_id' => [
