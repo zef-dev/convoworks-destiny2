@@ -52,6 +52,8 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
     private $_membershipType;
     private $_characterId;
 
+    private $_characterInventory;
+
     private $_duplicateItemsScope;
     private $_duplicateItemsName;
 
@@ -95,6 +97,8 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 
         $this->_characterId = $properties['character_id'];
         $this->_membershipType = $properties['membership_type'];
+
+        $this->_characterInventory = $properties['character_inventory'];
 
         $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
         $this->_duplicateItemsName = $properties['duplicate_items_name'] ?: 'duplicate_items';
@@ -157,7 +161,16 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             // find item
             $weapon_name = $result->getSlotValue('WeaponName');
 
-            $item_ids = [''];
+            $item_ids = [];
+
+            /** @var array $inventory */
+            $inventory = $this->evaluateString($this->_characterInventory);
+
+            foreach ($inventory as $item) {
+                if ($item['manifest_data']['displayProperties']['name'] === $weapon_name) {
+                    $item_ids[] = $item['base']['itemInstanceId'];
+                }
+            }
 
             if (count($item_ids) > 1)
             {
