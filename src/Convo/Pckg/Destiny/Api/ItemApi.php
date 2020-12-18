@@ -15,7 +15,7 @@ class ItemApi extends BaseDestinyApi
 
 		$res = $this->_queryManifest(BaseDestinyApi::ITEM_TABLE, $itemHash);
 
-		$this->_logger->debug('Got item manifest ['.print_r($res, true).']');
+		// $this->_logger->debug('Got item manifest ['.print_r($res, true).']');
 		return $res;
 	}
 
@@ -33,7 +33,7 @@ class ItemApi extends BaseDestinyApi
 
 		$res = $this->_queryManifest(BaseDestinyApi::PERK_TABLE, $perkHash);
 		
-		$this->_logger->debug('Got perk manifest ['.print_r($res, true).']');
+		// $this->_logger->debug('Got perk manifest ['.print_r($res, true).']');
 		return $res;
 	}
 }
