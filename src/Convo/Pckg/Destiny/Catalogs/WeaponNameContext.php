@@ -4,7 +4,7 @@ namespace Convo\Pckg\Destiny\Catalogs;
 
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 
-class WeaponNameContext extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\IServiceContext
+class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core\Workflow\IServiceContext
 {
     /**
      * @var \Psr\Log\LoggerInterface
@@ -42,8 +42,8 @@ class WeaponNameContext extends AbstractWorkflowComponent  implements \Convo\Cor
     public function init()
     {
         $this->_logger->debug('WeaponNameContext init');
-        $api_key = $this->evaluateString($this->_apiKey);
-        $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory, $api_key);
+        $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory, $this->_apiKey);
+        $this->_catalog->setService($this->getService());
     }
 
     public function getId()

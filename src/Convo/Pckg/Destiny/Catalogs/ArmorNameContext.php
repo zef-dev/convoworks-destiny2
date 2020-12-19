@@ -42,8 +42,8 @@ class ArmorNameContext extends AbstractWorkflowComponent  implements \Convo\Core
 	public function init()
 	{
 		$this->_logger->debug('ArmorNameContext init');
-		$api_key = $this->evaluateString($this->_apiKey);
-		$this->_catalog = new ArmorNameCatalog($this->_logger, $this->_httpFactory, $api_key);
+		$this->_catalog = new ArmorNameCatalog($this->_logger, $this->_httpFactory, $this->_apiKey);
+		$this->_catalog->setService($this->getService());
 	}
 
 	public function getId()

@@ -6,7 +6,9 @@ use Convo\Pckg\Destiny\Api\BaseDestinyApi;
 use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 use Convo\Pckg\Destiny\Service\DestinyManifestService;
 use Convo\Core\Util\StrUtil;
-class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
+use Convo\Core\Workflow\AbstractWorkflowComponent;
+
+class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
 	const CATALOG_VERSION = "2";
 
@@ -39,7 +41,8 @@ class ArmorNameCatalog implements \Convo\Core\Workflow\ICatalogSource
 	public function getCatalogValues($platform)
 	{
 		$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
-		$this->_manifests = $mservice->initManifest($this->_apiKey);
+		$api_key = $this->evaluateString($this->_apiKey);
+		$this->_manifests = $mservice->initManifest($api_key);
 
 		switch ($platform)
 		{
