@@ -9,12 +9,7 @@ use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 
 class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
-    const CATALOG_VERSION = "2";
-
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
-    private $_logger;
+    const CATALOG_VERSION = "3";
 
     /**
      * @var \Convo\Core\Util\IHttpFactory

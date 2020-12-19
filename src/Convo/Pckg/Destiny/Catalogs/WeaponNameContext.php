@@ -43,6 +43,7 @@ class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core
     {
         $this->_logger->debug('WeaponNameContext init');
         $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory, $this->_apiKey);
+        $this->_catalog->setParent($this->getService());
         $this->_catalog->setService($this->getService());
     }
 
