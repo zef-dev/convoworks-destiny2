@@ -54,11 +54,12 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 		$this->_logger = $logger;
 	}
 
-	protected function _performRequest($uri, $method, $body = [])
+	protected function _performRequest($uri, $method, $body = [], $invalidateCache = false)
 	{
 		$key = StrUtil::slugify($method.'_'.$uri);
 
-		if ($this->_cache->has($key)) {
+		if ($method === 'GET' && !$invalidateCache && $this->_cache->has($key))
+		{
 			$this->_logger->debug('Cache hit for ['.$method.']['.$uri.']');
 			return $this->_cache->get($key);
 		}
@@ -90,7 +91,7 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 
 		$res = isset($results[$id]) ? $results[$id] : false;
 
-		$this->_cache->set(StrUtil::slugify($key), $res, self::CACHE_DEFAULT_TTL);
+		// $this->_cache->set(StrUtil::slugify($key), $res, self::CACHE_DEFAULT_TTL);
 		return $res;
 	}
 
