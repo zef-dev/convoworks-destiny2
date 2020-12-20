@@ -16,11 +16,11 @@ class CharacterApi extends BaseDestinyApi
 		return $this->_performRequest($uri, 'GET');
 	}
 
-	public function getCharacter($membershipType, $membershipId, $characterId, $components)
+	public function getCharacter($membershipType, $membershipId, $characterId, $components, $invalidateCache = false)
 	{
 		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$membershipId/Character/$characterId/?components=".(implode(',', $components));
 
-		return $this->_performRequest($uri, 'GET');
+		return $this->_performRequest($uri, 'GET', [], $invalidateCache);
 	}
 
 	public function equipItems($itemIds, $characterId, $membershipType)
