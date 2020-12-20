@@ -23,7 +23,7 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
     private $_membershipType;
     private $_membershipId;
 
-    private $_itemInstanceIds;
+    private $_itemInstanceId;
 
     private $_scopeType;
     private $_storageName;
@@ -45,7 +45,7 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         $this->_membershipType = $properties['membership_type'];
         $this->_membershipId = $properties['membership_id'];
 
-        $this->_itemInstanceIds = $properties['item_instance_ids'];
+        $this->_itemInstanceId = $properties['item_instance_id'];
 
         $this->_scopeType = $properties['scope_type'];
         $this->_storageName = $properties['storage_name'];
@@ -59,29 +59,43 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         /** @var \Convo\Pckg\Destiny\Api\ItemApi $item_api */
         $item_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
 
-        $item_ids = $this->evaluateString($this->_itemInstanceIds);
-        $instances = [];
+        $item_id = $this->evaluateString($this->_itemInstanceId);
 
-        if (!is_array($item_ids)) {
-            $item_ids = explode(',', $item_ids);
-        }
+        $instance = $item_api->getItemInstance(
+            $this->evaluateString($this->_membershipType),
+            $this->evaluateString($this->_membershipId),
+            $item_id);
 
-        foreach ($item_ids as $item_id) {
-            $instance = $item_api->getItemInstance(
-                $this->evaluateString($this->_membershipType),
-                $this->evaluateString($this->_membershipId),
-                $item_id);
-
-            foreach ($instance['Response']['perks']['data']['perks'] as &$perk)
-            {
+        foreach ($instance['Response']['perks']['data']['perks'] as &$perk)
+        {
+            try {
+                $this->_logger->debug('Working with perk ['.print_r($perk, true).']');
+                if (!$perk['visible']) {
+                    $this->_logger->warning('Perk not considered visible. Skipping.');
+                    unset($perk);
+                    continue;
+                }
+                
                 $perk_definition = $item_api->getPerkManifest($perk['perkHash']);
-                $perk['name'] = $perk_definition['Response']['displayProperties']['name'];
+    
+                if (!isset($perk_definition['displayProperties']['name']) || empty($perk_definition['displayProperties']['name'])) {
+                    $this->_logger->warning('This perk has no name. Skipping');
+                    unset($perk);
+                    continue;
+                }
+    
+                $perk['name'] = $perk_definition['displayProperties']['name'];
+            } catch (\Exception $e) {
+                $this->_logger->error($e);
+                continue;
             }
-
-            $instances[] = new \Convo\Pckg\Destiny\ItemInstance($instance['Response']);
         }
+
+        $instance['Response']['perks']['data']['perks'] = array_values(array_filter($instance['Response']['perks']['data']['perks'], function($perk) {
+            return isset($perk['name']);
+        }));
 
         $params = $this->getService()->getServiceParams($this->_scopeType);
-        $params->setServiceParam($this->evaluateString($this->_storageName), $instances);
+        $params->setServiceParam($this->evaluateString($this->_storageName), $instance['Response']);
     }
 }
