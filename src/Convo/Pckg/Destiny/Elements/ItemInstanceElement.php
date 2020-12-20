@@ -35,10 +35,12 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         if (!isset($properties['api_key'])) {
             throw new \Exception('Missing API key in properties');
         }
+        $this->_apiKey = $properties['api_key'];
 
         if (!isset($properties['access_token'])) {
             throw new \Exception('Missing access token in properties');
         }
+        $this->_accessToken = $properties['access_token'];
 
         $this->_membershipType = $properties['membership_type'];
         $this->_membershipId = $properties['membership_id'];
@@ -60,7 +62,9 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         $item_ids = $this->evaluateString($this->_itemInstanceIds);
         $instances = [];
 
-        $item_ids = explode(',', $item_ids); 
+        if (!is_array($item_ids)) {
+            $item_ids = explode(',', $item_ids);
+        }
 
         foreach ($item_ids as $item_id) {
             $instance = $item_api->getItemInstance(
