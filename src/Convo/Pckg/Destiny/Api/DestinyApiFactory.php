@@ -34,9 +34,9 @@ class DestinyApiFactory
 	}
 
 	/**
-	 * @param $type
-	 * @param $apiKey
-	 * @param $accessToken
+	 * @param string $type
+	 * @param string $apiKey
+	 * @param string $accessToken
 	 * @return CharacterApi|ItemApi
 	 * @throws \Exception
 	 */
