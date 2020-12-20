@@ -53,51 +53,67 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 	private function _getAmazonFormattedNames()
 	{
 		$armors = $this->_getArmors();
-
-		// TODO: synonymize names by removing underscores, numbers, definite articles (the), etc.
-
 		$formatted = [
-			'values' => array_map(function ($armor) {
-				return [
-					'id' => StrUtil::slugify($armor['displayProperties']['name']),
-					'name' => [
-						'value' => $armor['displayProperties']['name']
-					]
-				];
-			}, $armors)
-		];
+            'values' => []
+        ];
+
+        foreach ($armors as $armor)
+        {
+			$id = strtoupper(StrUtil::slugify($armor));
+
+			if (empty($id)) {
+				$this->_logger->warning('Empty ID, skipping.');
+				continue;
+			}
+			
+            $a = [
+                'id' => $id,
+                'name' => [
+                    'value' => $armor
+                ],
+                'synonyms' => $this->_nameToSynonyms($armor)
+            ];
+
+            $formatted['values'][] = $a;
+        }
 
 		return $formatted;
 	}
 
+	private function _nameToSynonyms($name)
+    {
+        $return = [];
+
+        $return[] = trim(str_replace(['The', '-', '.', '/', '_'], ' ', $name));
+
+        return $return;
+    }
+
 	private function _getDialogflowFormattedNames()
 	{
-		$armors = $this->_getArmors();
-
-		return array_map(function ($armor) { return $armor['displayProperties']['name']; }, $armors);
+		return $this->_getArmors();
 	}
 
 	private function _getArmors()
 	{
 		/** @var \SQLite3 $db */
 		$db = $this->_manifests['db'];
+		$query = 'SELECT DISTINCT value
+        FROM DestinyInventoryItemDefinition as diid, json_each(diid.json, \'$.displayProperties.name\')
+		WHERE
+			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_HELMETS.'%\' OR
+			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_GAUNTLETS.'%\' OR
+			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_CHEST_ARMOR.'%\' OR
+			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_GREAVES.'%\' OR
+			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_CLASS_ITEMS.'%\';';
 
-		$results = [];
-		$result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
+		$result = $db->query($query);
+		$armors = [];
+
 		while ($row = $result->fetchArray()) {
-			$key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-			$results[$key] = json_decode($row[1], true);
+            // $key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
+			$armors[] = $row[0];
 		}
-
-		$armors = array_filter($results, function($item) {
-			return in_array($item['inventory']['bucketTypeHash'], [
-				DestinyBucketEnum::BUCKET_HELMETS,
-				DestinyBucketEnum::BUCKET_GAUNTLETS,
-				DestinyBucketEnum::BUCKET_CHEST_ARMOR,
-				DestinyBucketEnum::BUCKET_GREAVES,
-				DestinyBucketEnum::BUCKET_CLASS_ITEMS
-			]);
-		});
 
 		$this->_logger->debug('Got ['.count($armors).'] armor pieces');
 

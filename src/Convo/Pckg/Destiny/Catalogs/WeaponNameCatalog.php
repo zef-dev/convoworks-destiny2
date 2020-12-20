@@ -9,7 +9,7 @@ use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 
 class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
-    const CATALOG_VERSION = "3";
+    const CATALOG_VERSION = "4";
 
     /**
      * @var \Convo\Core\Util\IHttpFactory
@@ -52,39 +52,45 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
     private function _getAmazonFormattedNames()
     {
         $weapons = $this->_getWeapons();
-
         $formatted = [
             'values' => []
         ];
 
-        // TODO: synonymize names by removing underscores, numbers, definite articles (the), etc.
-        $formatted['values'] = array_map(function ($weapon) {
-            return [
-                'id' => StrUtil::slugify($weapon['displayProperties']['name']),
+        foreach ($weapons as $weapon)
+        {
+            $id = strtoupper(StrUtil::slugify($weapon));
+
+			if (empty($id)) {
+				$this->_logger->warning('Empty ID, skipping.');
+				continue;
+            }
+            
+            $w = [
+                'id' => $id,
                 'name' => [
-                    'value' => $weapon['displayProperties']['name']
+                    'value' => $weapon
                 ],
-                'synonyms' => $this->_nameToSynonyms($weapon['displayProperties']['name'])
+                'synonyms' => $this->_nameToSynonyms($weapon)
             ];
-        }, $weapons);
+
+            $formatted['values'][] = $w;
+        }
 
         return $formatted;
     }
 
     private function _nameToSynonyms($name)
     {
-        $return = [$name];
+        $return = [];
 
-        $return[] = str_ireplace(['the', '-', '.'], '', $name);
+        $return[] = trim(str_replace(['The', '-', '.', '/', '_'], ' ', $name));
 
         return $return;
     }
 
     private function _getDialogflowFormattedNames()
     {
-        $weapons = $this->_getWeapons();
-
-        return array_map(function ($weapon) { return $weapon['displayProperties']['name']; }, $weapons);
+        return $this->_getWeapons();
     }
 
     private function _getWeapons()
@@ -93,22 +99,20 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
 
 		/** @var \SQLite3 $db */
 		$db = $this->_manifests['db'];
+        $query = 'SELECT DISTINCT value
+        FROM DestinyInventoryItemDefinition as diid, json_each(diid.json, \'$.displayProperties.name\')
+        WHERE
+            diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_KINETIC_WEAPONS.'%\' OR
+            diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_ENERGY_WEAPONS.'%\' OR
+            diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_POWER_WEAPONS.'%\';';
 
-		$results = [];
-		$result = $db->query('SELECT * FROM '.BaseDestinyApi::ITEM_TABLE);
+		$result = $db->query($query);
+        $weapons = [];
 
 		while ($row = $result->fetchArray()) {
-			$key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
-			$results[$key] = json_decode($row[1], true);
+            // $key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
+			$weapons[] = $row[0];
 		}
-
-		$weapons = array_filter($results, function($item) {
-			return in_array($item['inventory']['bucketTypeHash'], [
-				DestinyBucketEnum::BUCKET_KINETIC_WEAPONS,
-				DestinyBucketEnum::BUCKET_ENERGY_WEAPONS,
-				DestinyBucketEnum::BUCKET_POWER_WEAPONS
-			]);
-		});
 
 		$this->_logger->debug('Got ['.count($weapons).'] weapons');
 
