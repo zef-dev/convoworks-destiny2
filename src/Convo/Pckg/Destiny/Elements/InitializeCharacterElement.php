@@ -60,10 +60,10 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 		$params = $this->getService()->getServiceParams($this->_scopeType);
 		$key = $this->evaluateString($this->_storageName);
 
-		if ($params->getServiceParam($key) !== null) { // TODO: store timestamp and check for expiry
-			$this->_logger->debug('Data already set. Will not bust cache yet.');
-			return;
-		}
+		// if ($params->getServiceParam($key) !== null) { // TODO: store timestamp and check for expiry
+		// 	$this->_logger->debug('Data already set. Will not bust cache yet.');
+		// 	return;
+		// }
 
     	$api_key = $this->evaluateString($this->_apiKey);
     	$acc_tkn = $this->evaluateString($this->_accessToken);
