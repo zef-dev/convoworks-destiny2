@@ -7,6 +7,7 @@ use Convo\Core\Workflow\IConversationElement;
 use Convo\Core\Workflow\IConvoRequest;
 use Convo\Core\Workflow\IConvoResponse;
 use Convo\Pckg\Destiny\Api\DestinyApiFactory;
+use Convo\Pckg\Destiny\Enums\DestinyEnergyEnum;
 
 class ItemInstanceElement extends AbstractWorkflowComponent implements IConversationElement
 {
@@ -64,36 +65,50 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
         $instance = $item_api->getItemInstance(
             $this->evaluateString($this->_membershipType),
             $this->evaluateString($this->_membershipId),
-            $item_id);
+            $item_id
+        );
 
-        foreach ($instance['Response']['perks']['data']['perks'] as &$perk)
-        {
-            try {
-                $this->_logger->debug('Working with perk ['.print_r($perk, true).']');
-                if (!$perk['visible']) {
-                    $this->_logger->warning('Perk not considered visible. Skipping.');
-                    unset($perk);
+        $this->_logger->debug('Got item instance ['.print_r($instance, true).']');
+
+        if (isset($instance['Response']['perks']['data']['perks'])) {
+            foreach ($instance['Response']['perks']['data']['perks'] as &$perk)
+            {
+                try {
+                    $this->_logger->debug('Working with perk ['.print_r($perk, true).']');
+                    if (!$perk['visible']) {
+                        $this->_logger->warning('Perk not considered visible. Skipping.');
+                        continue;
+                    }
+                    
+                    $perk_definition = $item_api->getPerkManifest($perk['perkHash']);
+        
+                    if (!isset($perk_definition['displayProperties']['name']) || empty($perk_definition['displayProperties']['name'])) {
+                        $this->_logger->warning('This perk has no name. Skipping');
+                        continue;
+                    }
+        
+                    $perk['manifest'] = $perk_definition;
+                } catch (\Exception $e) {
+                    $this->_logger->error($e);
                     continue;
                 }
-                
-                $perk_definition = $item_api->getPerkManifest($perk['perkHash']);
-    
-                if (!isset($perk_definition['displayProperties']['name']) || empty($perk_definition['displayProperties']['name'])) {
-                    $this->_logger->warning('This perk has no name. Skipping');
-                    unset($perk);
-                    continue;
-                }
-    
-                $perk['name'] = $perk_definition['displayProperties']['name'];
-            } catch (\Exception $e) {
-                $this->_logger->error($e);
-                continue;
             }
+
+            $instance['Response']['perks']['data']['perks'] = array_values(
+                array_filter(
+                    $instance['Response']['perks']['data']['perks'],
+                    function($perk)
+                    {
+                        return isset($perk['manifest']['displayProperties']['name']) &&
+                        !empty($perk['manifest']['displayProperties']['name']);
+                    }
+                )
+            );
         }
 
-        $instance['Response']['perks']['data']['perks'] = array_values(array_filter($instance['Response']['perks']['data']['perks'], function($perk) {
-            return isset($perk['name']);
-        }));
+        if (isset($instance['Response']['instance']['data']['energy'])) {
+            $instance['Response']['instance']['data']['energy']['energyType'] = DestinyEnergyEnum::ENERGY_TYPES[$instance['Response']['instance']['data']['energy']['energyType']];
+        }
 
         $params = $this->getService()->getServiceParams($this->_scopeType);
         $params->setServiceParam($this->evaluateString($this->_storageName), $instance['Response']);
