@@ -9,9 +9,9 @@ class CharacterApi extends BaseDestinyApi
 		parent::__construct($httpFactory, $manifestDb, $cache, $apiKey, $accessToken);
 	}
 
-	public function getUserProfile($membershipType, $membershipId)
+	public function getUserProfile($membershipType, $membershipId, $components)
 	{
-		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$membershipId/?components=100";
+		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$membershipId/?components=".(implode(',', $components));
 
 		return $this->_performRequest($uri, 'GET');
 	}
