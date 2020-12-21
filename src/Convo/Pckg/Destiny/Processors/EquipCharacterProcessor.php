@@ -140,80 +140,87 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $membership_type = $this->evaluateString($this->_membershipType);
 
         if ($sys_intent->getName() === 'EquipWeaponIntent')
-        {
-            $this->_logger->debug('Handling EquipWeaponIntent');
-            
+        {   
             // find item
-            $weapon_name = $result->getSlotValue('WeaponName');
+            $item_name = strtolower($result->getSlotValue('WeaponName'));
+            $this->_logger->debug('Handling EquipWeaponIntent with weapon ['.$item_name.']');
+        }
+        else if ($sys_intent->getName() === 'EquipArmorIntent')
+        {
+            // find item
+            $item_name = strtolower($result->getSlotValue('ArmorName'));
+            $this->_logger->debug('Handling EquipArmorIntent with armor ['.$item_name.']');
+        }
+        else
+        {
+            throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().']'.
+            ' but expected EquipWeaponIntent or EquipArmorIntent');
+        }
 
-            /** @var array $inventory */
-            $inventory = $this->evaluateString($this->_inventory);
-            $item_ids = [];
+        /** @var array $inventory */
+        $inventory = $this->evaluateString($this->_inventory);
+        $item_ids = [];
 
-            foreach ($inventory as $item) {
-                if (strtolower($item['manifest']['displayProperties']['name']) === strtolower($weapon_name)) {
-                    $item_ids[] = $item['base']['itemInstanceId'];
-                }
+        foreach ($inventory as $item) {
+            $inventory_item_name = strtolower($item['manifest']['displayProperties']['name']);
+            $this->_logger->debug('Considering inventory item ['.$inventory_item_name.']');
+
+            if (stripos($inventory_item_name, $item_name) !== false) {
+                $this->_logger->debug('Found potential candidate with instance ID ['.$item['base']['itemInstanceId'].']');
+                $item_ids[] = $item['base']['itemInstanceId'];
+            }
+        }
+
+        $this->_logger->debug('Final item IDs to consider ['.print_r($item_ids, true).']');
+
+        if (count($item_ids) > 1)
+        {
+            // duplicate items with the same name found
+            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+
+            $name = $this->evaluateString($this->_duplicateItemsName);
+            $this->_logger->debug('Going to store duplicate item IDs ['.implode(', ', $item_ids).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
+            
+            $params->setServiceParam($name, $item_ids);
+
+            foreach ($this->_duplicatesFound as $df) {
+                $df->read($request, $response);
             }
 
-            if (count($item_ids) > 1)
-            {
-                // duplicate items with the same name found
-                $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            return;
+        }
+        else if (count($item_ids) === 1)
+        {
+            $this->_logger->debug('One item found. Equipping.');
+            try {
+                // one item found, equip it
+                $character_api->equipItems(
+                    $item_ids, $char_id, $membership_type
+                );
 
-                $name = $this->evaluateString($this->_duplicateItemsName);
-                $this->_logger->debug('Going to store duplicate item IDs ['.implode(', ', $item_ids).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
+                $this->_logger->debug('Item equipped. Reading OK flow.');
                 
-                $params->setServiceParam($name, $item_ids);
-
-                foreach ($this->_duplicatesFound as $df) {
-                    $df->read($request, $response);
+                foreach ($this->_ok as $ok) {
+                    $ok->read($request, $response);
                 }
+            } catch (\Exception $e) {
+                $this->_logger->error($e);
 
-                return;
-            }
-            else if (count($item_ids) === 1)
-            {
-                $this->_logger->debug('One item found. Equipping.');
-                try {
-                    // one item found, equip it
-                    $character_api->equipItems(
-                        $item_ids, $char_id, $membership_type
-                    );
-
-                    $this->_logger->debug('Item equipped. Reading OK flow.');
-                    
-                    foreach ($this->_ok as $ok) {
-                        $ok->read($request, $response);
-                    }
-                } catch (\Exception $e) {
-                    $this->_logger->error($e);
-
-                    foreach ($this->_nok as $nok) {
-                        $nok->read($request, $response);
-                    }
-                } finally {
-                    return;
-                }
-            }
-            else
-            {
-                // none found
                 foreach ($this->_nok as $nok) {
                     $nok->read($request, $response);
                 }
-                
+            } finally {
                 return;
             }
         }
-
-        if ($sys_intent->getName() === 'EquipArmorIntent')
+        else
         {
-            $this->_logger->debug('Handling EquipArmorIntent');
+            // none found
+            foreach ($this->_nok as $nok) {
+                $nok->read($request, $response);
+            }
+            
             return;
         }
-        
-        throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().']'.
-		    ' but expected EquipWeaponIntent or EquipArmorIntent');
     }
 }
