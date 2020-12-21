@@ -1,7 +1,10 @@
 {
     "EquipWeaponIntent": [
         {
-            "platforms": ["amazon", "dialogflow"],
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
             "definition": {
                 "name": "EquipWeaponIntent",
                 "type": "custom",
@@ -62,10 +65,12 @@
             }
         }
     ],
-    "EquipArmorIntent": 
-    [
+    "EquipArmorIntent": [
         {
-            "platforms": ["amazon", "dialogflow"],
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
             "definition": {
                 "name": "EquipArmorIntent",
                 "type": "custom",
@@ -119,6 +124,162 @@
                                 "text": "Wild Hunt Vestment",
                                 "type": "@ArmorName",
                                 "slot_value": "ArmorName"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "TransferToVaultIntent": [
+        {
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
+            "definition": {
+                "name": "TransferToVaultIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "transfer Heiro Camo to the vault",
+                        "model": [
+                            {
+                                "text": "transfer"
+                            },
+                            {
+                                "text": "Heiro Camo",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "to the vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "place Night Watch in my vault",
+                        "model": [
+                            {
+                                "text": "place"
+                            },
+                            {
+                                "text": "Night Watch",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "in my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put Phobos Warden Cowl in the vault",
+                        "model": [
+                            {
+                                "text": "put"
+                            },
+                            {
+                                "text": "Phobos Warden Cowl",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "in the vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "transfer Witherhoard to my vault",
+                        "model": [
+                            {
+                                "text": "transfer"
+                            },
+                            {
+                                "text": "Witherhoard",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "to my vault"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "TransferToCharacterIntent": [
+        {
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
+            "definition": {
+                "name": "TransferToCharacterIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "get Ophidian Aspect from the vault",
+                        "model": [
+                            {
+                                "text": "get"
+                            },
+                            {
+                                "text": "Ophidian Aspect",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "from the vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "take out Hollow Words from my vault",
+                        "model": [
+                            {
+                                "text": "take out"
+                            },
+                            {
+                                "text": "Hollow Words",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "from my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "get Night Watch from my vault",
+                        "model": [
+                            {
+                                "text": "get"
+                            },
+                            {
+                                "text": "Night Watch",
+                                "type": "@WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "from my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "transfer Phobos Warden Cowl to my character",
+                        "model": [
+                            {
+                                "text": "transfer"
+                            },
+                            {
+                                "text": "Phobos Warden Cowl",
+                                "type": "@ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "to my character"
                             }
                         ]
                     }
