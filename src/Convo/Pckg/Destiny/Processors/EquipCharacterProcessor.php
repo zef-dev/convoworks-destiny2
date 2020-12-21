@@ -52,6 +52,8 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
     private $_duplicateItemsScope;
     private $_duplicateItemsName;
 
+    private $_errorMessageName;
+
     public function __construct($properties, $packageProviderFactory, $destinyApiFactory, $service)
     {
         parent::__construct($properties);
@@ -91,7 +93,9 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $this->_inventory = $properties['inventory'];
 
         $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
-        $this->_duplicateItemsName = $properties['duplicate_items_name'] ?: 'duplicate_items';
+        $this->_duplicateItemsName = $properties['duplicate_items_name'] ?? 'duplicate_items';
+
+        $this->_errorMessageName = $properties['error_message_name'] ?? 'errorMsg';
 
         $this->_requestFilters = $this->_initFilters();
     }
@@ -186,16 +190,14 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             foreach ($this->_duplicatesFound as $df) {
                 $df->read($request, $response);
             }
-
-            return;
         }
         else if (count($item_ids) === 1)
         {
             $this->_logger->debug('One item found. Equipping.');
             try {
                 // one item found, equip it
-                $character_api->equipItems(
-                    $item_ids, $char_id, $membership_type
+                $result = $character_api->equipItem(
+                    $item_ids[0], $char_id, $membership_type
                 );
 
                 $this->_logger->debug('Item equipped. Reading OK flow.');
@@ -206,21 +208,40 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             } catch (\Exception $e) {
                 $this->_logger->error($e);
 
+                if (method_exists($e, 'getResponse')) {
+                    // can get response
+                    $this->_logger->debug('Can get response off of error');
+                    $res = json_decode($e->getResponse()->getBody()->__toString(), true);
+
+                    $this->_logger->debug('Got response ['.print_r($res, true).']');
+
+                    if (isset($res['Message'])) {
+                        $err_name = $this->evaluateString($this->_errorMessageName);
+                        $this->_logger->debug('Setting message ['.$res['Message'].'] under the name ['.$err_name.']');
+
+                        $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+                        $params->setServiceParam($err_name, $res['Message']);
+                    }
+                }
+
                 foreach ($this->_nok as $nok) {
+                    $this->_logger->debug('Reading NOK');
                     $nok->read($request, $response);
                 }
-            } finally {
-                return;
             }
         }
         else
         {
             // none found
+            $err_name = $this->evaluateString($this->_errorMessageName);
+            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            $params->setServiceParam($err_name, "No item with that name was found.");
+
             foreach ($this->_nok as $nok) {
                 $nok->read($request, $response);
             }
-            
-            return;
         }
+
+        return;
     }
 }
