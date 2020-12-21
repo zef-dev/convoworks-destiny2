@@ -24,7 +24,7 @@ class DestinyApiFactory
 	 */
 	private $_cache;
 
-	private $_manifests;
+	private $_manifestDb;
 
 	public function __construct($logger, $httpFactory, $cache)
 	{
@@ -42,18 +42,18 @@ class DestinyApiFactory
 	 */
 	public function getApi($type, $apiKey, $accessToken)
 	{
-		if (!$this->_manifests) {
+		if (!$this->_manifestDb) {
 			$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
-			$this->_manifests = $mservice->initManifest($apiKey);
+			$this->_manifestDb = $mservice->initManifest($apiKey);
 		}
 
 		switch ($type) {
 			case self::API_TYPE_CHARACTER:
-				$api = new CharacterApi($this->_httpFactory, $this->_manifests, $this->_cache, $apiKey, $accessToken);
+				$api = new CharacterApi($this->_httpFactory, $this->_manifestDb, $this->_cache, $apiKey, $accessToken);
 				$api->setLogger($this->_logger);
 				return $api;
 			case self::API_TYPE_ITEM:
-				$api = new ItemApi($this->_httpFactory, $this->_manifests, $this->_cache, $apiKey, $accessToken);
+				$api = new ItemApi($this->_httpFactory, $this->_manifestDb, $this->_cache, $apiKey, $accessToken);
 				$api->setLogger($this->_logger);
 				return $api;
 			default:

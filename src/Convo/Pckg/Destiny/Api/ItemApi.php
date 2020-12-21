@@ -4,9 +4,9 @@ namespace Convo\Pckg\Destiny\Api;
 
 class ItemApi extends BaseDestinyApi
 {
-	public function __construct($httpFactory, $manifests, $cache, $apiKey, $accessToken)
+	public function __construct($httpFactory, $manifestDb, $cache, $apiKey, $accessToken)
 	{
-		parent::__construct($httpFactory, $manifests, $cache, $apiKey, $accessToken);
+		parent::__construct($httpFactory, $manifestDb, $cache, $apiKey, $accessToken);
 	}
 
 	public function getItemManifest($itemHash)

@@ -22,6 +22,13 @@ class DestinyManifestService
         $this->_httpFactory = $httpFactory;    
     }
 
+	/**
+	 * Fetches and instantiates the current manifest DB
+	 *
+	 * @param string $apiKey
+	 * @return \SQLite3
+	 * @throws \Exception DB could not be instantiated.
+	 */
     public function initManifest($apiKey)
 	{
 		$url = BaseDestinyApi::BASE_URL . "/Platform/Destiny2/Manifest/";
@@ -68,25 +75,10 @@ class DestinyManifestService
 			$zip->close();
 		}
 
-		$tables = array();
 		if ($db = new \SQLite3($cacheFilePath)) {
-			$result = $db->query("SELECT name FROM sqlite_master WHERE type='table'");
-
-			while ($row = $result->fetchArray()) {
-				$table = [];
-				$pragma = $db->query("PRAGMA table_info(".$row['name'].")");
-
-				while ($row_pragma = $pragma->fetchArray()) {
-					$table[] = $row_pragma[1];
-				}
-
-				$tables[$row['name']] = $table;
-			}
+			return $db;
 		}
 
-		return [
-			'db' => $db,
-			'tables' => $tables
-		];
+		throw new \Exception('Could not instantiate manifest DB');
 	}
 }

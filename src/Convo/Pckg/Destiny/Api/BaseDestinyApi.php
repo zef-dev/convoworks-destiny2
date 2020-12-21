@@ -26,7 +26,10 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 	 */
 	protected $_httpFactory;
 
-	protected $_manifests;
+	/**
+	 * @var \SQLite3
+	 */
+	protected $_manifestDb;
 
 	/**
 	 * @var \Psr\SimpleCache\CacheInterface
@@ -36,12 +39,12 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 	private $_apiKey;
 	private $_accessToken;
 
-	public function __construct(\Convo\Core\Util\IHttpFactory $httpFactory, $manifests, \Psr\SimpleCache\CacheInterface $cache, $apiKey, $accessToken)
+	public function __construct(\Convo\Core\Util\IHttpFactory $httpFactory, $manifestDb, \Psr\SimpleCache\CacheInterface $cache, $apiKey, $accessToken)
 	{
 		$this->_logger = new \Psr\Log\NullLogger();
 		$this->_httpFactory = $httpFactory;
 
-		$this->_manifests = $manifests;
+		$this->_manifestDb = $manifestDb;
 
 		$this->_cache = $cache;
 
@@ -80,25 +83,17 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 
 	protected function _queryManifest($tableName, $id)
 	{
-		$key = $this->_manifests['tables'][$tableName][0];
-
-//		if ($this->_cache->has(StrUtil::slugify($key))) {
-//			return $this->_cache->get(StrUtil::slugify($key));
-//		}
-
-		$where = ' WHERE '.(is_numeric($id) ? $key.'='.$id.' OR '.$key.'='.($id-4294967296) : $key.'="'.$id.'"');
+		$where = ' WHERE '.(is_numeric($id) ? 'id='.$id.' OR id='.($id-4294967296) : "id=\"$id\"");
 		$results = $this->_doQuery('SELECT * FROM '.$tableName.$where);
 
-		$res = isset($results[$id]) ? $results[$id] : false;
+		$res = $results[$id] ?? false;
 
-		// $this->_cache->set(StrUtil::slugify($key), $res, self::CACHE_DEFAULT_TTL);
 		return $res;
 	}
 
 	private function _doQuery($query)
 	{
-		/** @var \SQLite3 $cacheFilePath */
-		$db = $this->_manifests['db'];
+		$db = $this->_manifestDb;
 
 		$results = [];
 		$result = $db->query($query);
