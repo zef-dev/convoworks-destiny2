@@ -18,7 +18,7 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
 
     private $_apiKey;
 
-    private $_manifests;
+    private $_manifestDb;
 
     public function __construct($logger, $httpFactory, $apiKey)
     {
@@ -36,7 +36,7 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
     {
         $mservice = new \Convo\Pckg\Destiny\Service\DestinyManifestService($this->_logger, $this->_httpFactory);
         $api_key = $this->evaluateString($this->_apiKey);
-        $this->_manifests = $mservice->initManifest($api_key);
+        $this->_manifestDb = $mservice->initManifest($api_key);
 
         switch ($platform)
         {
@@ -95,10 +95,6 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
 
     private function _getWeapons()
 	{
-        $this->_logger->debug('Initializing weapons');
-
-		/** @var \SQLite3 $db */
-		$db = $this->_manifests['db'];
         $query = 'SELECT DISTINCT value
         FROM DestinyInventoryItemDefinition as diid, json_each(diid.json, \'$.displayProperties.name\')
         WHERE
@@ -106,11 +102,10 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
             diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_ENERGY_WEAPONS.'%\' OR
             diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_POWER_WEAPONS.'%\';';
 
-		$result = $db->query($query);
+		$result = $this->_manifestDb->query($query);
         $weapons = [];
 
 		while ($row = $result->fetchArray()) {
-            // $key = is_numeric($row[0]) ? sprintf('%u', $row[0] & 0xFFFFFFFF) : $row[0];
 			$weapons[] = $row[0];
 		}
 

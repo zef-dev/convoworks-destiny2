@@ -17,7 +17,7 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 	 */
 	private $_httpFactory;
 
-	private $_manifests;
+	private $_manifestDb;
 
 	private $_apiKey;
 
@@ -37,7 +37,7 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 	{
 		$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
 		$api_key = $this->evaluateString($this->_apiKey);
-		$this->_manifests = $mservice->initManifest($api_key);
+		$this->_manifestDb = $mservice->initManifest($api_key);
 
 		switch ($platform)
 		{
@@ -96,8 +96,6 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 
 	private function _getArmors()
 	{
-		/** @var \SQLite3 $db */
-		$db = $this->_manifests['db'];
 		$query = 'SELECT DISTINCT value
         FROM DestinyInventoryItemDefinition as diid, json_each(diid.json, \'$.displayProperties.name\')
 		WHERE
@@ -107,7 +105,7 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_GREAVES.'%\' OR
 			diid.json LIKE \'%'.DestinyBucketEnum::BUCKET_CLASS_ITEMS.'%\';';
 
-		$result = $db->query($query);
+		$result = $this->_manifestDb->query($query);
 		$armors = [];
 
 		while ($row = $result->fetchArray()) {
