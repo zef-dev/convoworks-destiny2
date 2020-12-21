@@ -25,4 +25,6 @@ abstract class DestinyBucketEnum
     const BUCKET_CHEST_ARMOR = 14239492;
     const BUCKET_GREAVES = 20886954;
     const BUCKET_CLASS_ITEMS = 1585787867;
+
+    const BUCKET_VAULT = 138197802;
 }
