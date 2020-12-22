@@ -9,11 +9,11 @@ class CharacterApi extends BaseDestinyApi
 		parent::__construct($httpFactory, $manifestDb, $cache, $apiKey, $accessToken);
 	}
 
-	public function getUserProfile($membershipType, $membershipId, $components)
+	public function getUserProfile($membershipType, $membershipId, $components, $invalidateCache)
 	{
 		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$membershipId/?components=".(implode(',', $components));
 
-		return $this->_performRequest($uri, 'GET');
+		return $this->_performRequest($uri, 'GET', [], $invalidateCache);
 	}
 
 	public function getCharacter($membershipType, $membershipId, $characterId, $components, $invalidateCache = false)
@@ -55,6 +55,35 @@ class CharacterApi extends BaseDestinyApi
 		];
 
 		$this->_logger->debug('Going to POST EquipItems with ['.print_r($body, true).']');
+
+		return $this->_performRequest($uri, 'POST', $body);
+	}
+
+	/**
+	 * Transfer an item between the vault and a character
+	 *
+	 * @param string $itemReferenceHash
+	 * @param int $stackSize
+	 * @param boolean $transferToVault
+	 * @param string $itemId
+	 * @param string $characterId
+	 * @param string $membershipType
+	 * @return array
+	 */
+	public function transferItem($itemReferenceHash, $stackSize, $transferToVault, $itemId, $characterId, $membershipType)
+	{
+		$uri = parent::BASE_URL . '/Platform/Destiny2/Actions/Items/TransferItem/';
+
+		$body = [
+			'itemReferenceHash' => $itemReferenceHash,
+			'stackSize' => $stackSize,
+			'transferToVault' => $transferToVault,
+			'itemId' => $itemId,
+			'characterId' => $characterId,
+			'membershipType' => $membershipType
+		];
+
+		$this->_logger->debug('Going to POST TransferItem with ['.print_r($body, true).']');
 
 		return $this->_performRequest($uri, 'POST', $body);
 	}
