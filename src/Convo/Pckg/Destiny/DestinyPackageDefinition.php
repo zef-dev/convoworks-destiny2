@@ -120,6 +120,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 							'multiple' => true,
 							'options' => [
 								'100' => 'Profile',
+								'102' => 'Profile Inventory (Vault)',
 								'200' => 'Character',
 								'201' => 'Character Inventory',
 								'205' => 'Character Equipment',
@@ -377,7 +378,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'editor_properties' => [],
 						'defaultValue' => null,
 						'name' => 'Character inventory',
-						'description' => 'Collection of items in the character\'s inventory. At minimum, equippable items need to have a name attribute and an item instance ID',
+						'description' => 'Collection of items in the character\'s inventory.',
 						'valueType' => 'string'
 					],
 					'duplicate_items_scope' => [
@@ -497,6 +498,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Membership type for the chosen profile',
 						'valueType' => 'string'
 					],
+					'membership_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership ID',
+						'description' => 'Membership ID for the chosen profile',
+						'valueType' => 'string'
+					],
 					'character_id' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
@@ -505,12 +514,20 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Character ID that you wish to manage equipment for',
 						'valueType' => 'string'
 					],
-					'inventory' => [
+					'profile_inventory' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
 						'name' => 'Character inventory',
-						'description' => 'Collection of items in the character\'s inventory',
+						'description' => 'Collection of items in the profile inventory (including the vault).',
+						'valueType' => 'string'
+					],
+					'character_inventory' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character inventory',
+						'description' => 'Collection of items in the character\'s inventory.',
 						'valueType' => 'string'
 					],
 					'ok' => [
