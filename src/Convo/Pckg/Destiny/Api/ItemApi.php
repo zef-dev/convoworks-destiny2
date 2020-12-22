@@ -11,17 +11,11 @@ class ItemApi extends BaseDestinyApi
 
 	public function getItemManifest($itemHash)
 	{
-		$this->_logger->debug('Going to get item manifest with hash ['.$itemHash.']');
-
-		$res = $this->_queryManifest(BaseDestinyApi::ITEM_TABLE, $itemHash);
-
-		// $this->_logger->debug('Got item manifest ['.print_r($res, true).']');
-		return $res;
+		return $this->_queryManifest(BaseDestinyApi::ITEM_TABLE, $itemHash);
 	}
 
 	public function getItemInstance($membershipType, $destinyMembershipId, $itemInstanceId)
 	{
-		$this->_logger->debug('Going to get item instance by ID ['.$itemInstanceId.']');
 		$uri = parent::BASE_URL . "/Platform/Destiny2/$membershipType/Profile/$destinyMembershipId/Item/$itemInstanceId/?components=300,301,302,303,304,307";
 
 		return $this->_performRequest($uri, 'GET');
@@ -29,11 +23,6 @@ class ItemApi extends BaseDestinyApi
 
 	public function getPerkManifest($perkHash)
 	{
-		$this->_logger->debug('Going to get perk manifest with hash ['.$perkHash.']');
-
-		$res = $this->_queryManifest(BaseDestinyApi::PERK_TABLE, $perkHash);
-		
-		// $this->_logger->debug('Got perk manifest ['.print_r($res, true).']');
-		return $res;
+		return $this->_queryManifest(BaseDestinyApi::PERK_TABLE, $perkHash);
 	}
 }
