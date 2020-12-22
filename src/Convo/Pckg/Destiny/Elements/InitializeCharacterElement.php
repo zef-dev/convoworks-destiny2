@@ -58,7 +58,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
     public function read(IConvoRequest $request, IConvoResponse $response)
     {
 		$params = $this->getService()->getServiceParams($this->_scopeType);
-		$key = $this->evaluateString($this->_storageName);
+		// $key = $this->evaluateString($this->_storageName);
 
 		// if ($params->getServiceParam($key) !== null) { // TODO: store timestamp and check for expiry
 		// 	$this->_logger->debug('Data already set. Will not bust cache yet.');
@@ -77,12 +77,23 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 
         $this->_logger->debug('Going to try to load character ['.$mstp.']['.$msid.']['.$chid.']['.print_r($this->_initComponents, true).']');
 
-        $res = $capi->getCharacter($mstp, $msid, $chid, $this->_initComponents, true);
-        $character = [
+		$res = $capi->getCharacter($mstp, $msid, $chid, $this->_initComponents, true);
+		$character = [
 			'inventory' => [],
 			'equipment' => [],
-			'gear' => []
+			'gear' => [],
+			'vault' => [],
+			'profile_inventory' => [],
+			'full_profile_inventory' => []
 		];
+
+		$storage_name = $this->evaluateString($this->_storageName);
+
+		$existing = $this->getService()->getServiceParams($this->_scopeType)->getServiceParam($storage_name);
+		if (!empty($existing)) {
+			$this->_logger->debug('Got existing character to use');
+			$character = $existing;
+		}
 
         if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_INVENTORY, $this->_initComponents)) {
         	// deserialize inventory
@@ -98,16 +109,13 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 					$item = [
 						'base' => [
 							'itemHash' => $inventory_item['itemHash'],
-							'bucketHash' => $inventory_item['bucketHash']
+							'itemInstanceId' => $inventory_item['itemInstanceId'] ?? null,
+							'bucketHash' => $inventory_item['bucketHash'] ?? null
 						],
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
 					];
-
-					if (isset($inventory_item['itemInstanceId'])) {
-						$item['base']['itemInstanceId'] = $inventory_item['itemInstanceId'];
-					}
 
 					$deserialized_inventory[] = $item;
 				} catch (\Exception $e) {
@@ -117,7 +125,6 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 			}
 
 			$character['inventory'] = $deserialized_inventory;
-			$character['gear'] = array_merge($character['gear'], $character['inventory']);
 
 			$this->_logger->debug('Deserialized ['.count($character['inventory']).'] inventory items');
 		}
@@ -128,38 +135,72 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 
 			$this->_logger->debug('Going to deserialize ['.count($equipment).'] equipment items');
 
-			$deserialized_equipment = [];
-
-			foreach ($equipment as $equipment_item) {
+			foreach ($equipment as $profile_item) {
 				try {
-					$manifest = $iapi->getItemManifest($equipment_item['itemHash']);
+					$manifest = $iapi->getItemManifest($profile_item['itemHash']);
 					$item = [
 						'base' => [
-							'itemHash' => $equipment_item['itemHash'],
-							'itemInstanceId' => $equipment_item['itemInstanceId'],
-							'bucketHash' => $equipment_item['bucketHash']
+							'itemHash' => $profile_item['itemHash'],
+							'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
+							'bucketHash' => $profile_item['bucketHash'] ?? null
 						],
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
 					];
-					$deserialized_equipment[] = $item;
+					$character['equipment'][] = $item;
 				} catch (\Exception $e) {
 					$this->_logger->error($e);
 					continue;
 				}
 			}
 
-			$character['equipment'] = $deserialized_equipment;
-			$character['gear'] = array_merge($character['gear'], $character['equipment']);
-
 			$this->_logger->debug('Deserialized ['.count($character['equipment']).'] equipment items');
 		}
 
-		$character['gear'] = array_filter($character['gear'], function($item) {
-			return in_array($item['base']['bucketHash'], DestinyBucketEnum::EQUIPPABLE_GEAR);
+		if (in_array(BaseDestinyApi::COMPONENT_PROFILE_INVENTORY, $this->_initComponents)) {
+			$profile_response = $capi->getUserProfile($mstp, $msid, [BaseDestinyApi::COMPONENT_PROFILE_INVENTORY], true);
+			$profile_items = $profile_response["Response"]["profileInventory"]["data"]["items"];
+
+			$this->_logger->debug('Going to deserialize ['.count($profile_items).'] profile items');
+
+			foreach ($profile_items as $profile_item) {
+				try {
+					$manifest = $iapi->getItemManifest($profile_item['itemHash']);
+					$item = [
+						'base' => [
+							'itemHash' => $profile_item['itemHash'],
+							'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
+							'bucketHash' => $profile_item['bucketHash'] ?? null
+						],
+						'manifest' => [
+							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
+						]
+					];
+
+					if ($item['base']['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
+						$character['vault'][] = $item;
+					} else {
+						$character['profile_inventory'][] = $item;
+					}
+
+					$character['full_profile_inventory'][] = $item;
+				} catch (\Exception $e) {
+					$this->_logger->error($e);
+					continue;
+				}
+			}
+
+			$this->_logger->debug('Deserialized ['.count($character['profile_inventory']).'] profile inventory items not including ['.count($character['vault']).'] vault items');
+		}
+
+		if (!empty($character['gear'])) {
+			$character['gear'] = [];
+		}
+		$character['gear'] = array_filter(array_merge($character['gear'], $character['inventory']), function($item) {
+			return isset($item['base']['bucketHash']) && in_array($item['base']['bucketHash'], DestinyBucketEnum::EQUIPPABLE_GEAR);
 		});
 
-        $params->setServiceParam($this->evaluateString($this->_storageName), $character);
+        $params->setServiceParam($storage_name, $character);
     }
 }
