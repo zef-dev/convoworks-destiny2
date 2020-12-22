@@ -11,6 +11,8 @@ abstract class BaseDestinyApi implements \Psr\Log\LoggerAwareInterface
 	const ITEM_TABLE = 'DestinyInventoryItemDefinition';
 	const PERK_TABLE = 'DestinySandboxPerkDefinition';
 
+	const COMPONENT_PROFILE_INVENTORY = "102";
+	
 	const COMPONENT_CHARACTER_INVENTORY = "201";
 	const COMPONENT_CHARACTER_EQUIPMENT = "205";
 
