@@ -157,12 +157,16 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         }
         else
         {
-            throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().']'.
-            ' but expected EquipWeaponIntent or EquipArmorIntent');
+            throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().'] but expected EquipWeaponIntent or EquipArmorIntent');
         }
 
         /** @var array $inventory */
         $inventory = $this->evaluateString($this->_inventory);
+
+        if (!is_array($inventory)) {
+            throw new \Exception('Expected to find array of items for the inventory property.');
+        }
+
         $item_ids = [];
 
         foreach ($inventory as $item) {
