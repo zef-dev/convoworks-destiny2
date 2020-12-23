@@ -213,7 +213,20 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         try {
             if (count($items) > 1)
             {
-                // duplicates
+                // duplicate items with the same name found
+                $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+
+                $name = $this->evaluateString($this->_duplicateItemsName);
+                $this->_logger->debug('Going to store duplicate items ['.print_r($items, true).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
+                
+                $params->setServiceParam($name, $items);
+                $params->setServiceParam('transfer_to_vault', $transfer_to_vault);
+
+                foreach ($this->_duplicatesFound as $df) {
+                    $df->read($request, $response);
+                }
+
+                return;
             }
             else if (count($items) === 1)
             {
