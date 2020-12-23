@@ -5,6 +5,8 @@ namespace Convo\Pckg\Destiny;
 use Convo\Core\Factory\AbstractPackageDefinition;
 use Convo\Core\Factory\ComponentDefinition;
 use Convo\Core\Factory\IComponentFactory;
+use Convo\Core\Intent\EntityModel;
+use Convo\Core\Intent\SystemEntity;
 
 class DestinyPackageDefinition extends AbstractPackageDefinition
 {
@@ -37,6 +39,38 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 		$this->_destinyApiFactory = $destinyApiFactory;
 
 		parent::__construct($logger, self::NAMESPACE, __DIR__);
+	}
+
+	protected function _initEntities()
+	{
+		$entities = [];
+		$entities['WeaponName'] = new SystemEntity('WeaponName');
+		$weapon_name_model = new EntityModel('WeaponName', false);
+		$weapon_name_model->load([
+			"name" => "WeaponName",
+			"values" => [
+				[
+					"value" => "Night Watch"
+				]
+			]
+		]);
+        $entities['WeaponName']->setPlatformModel('amazon', $weapon_name_model);
+        $entities['WeaponName']->setPlatformModel('dialogflow', $weapon_name_model);
+
+		$entities['ArmorName'] = new SystemEntity('ArmorName');
+		$weapon_name_model = new EntityModel('ArmorName', false);
+		$weapon_name_model->load([
+			"name" => "ArmorName",
+			"values" => [
+				[
+					"value" => "Heiro Camo"
+				]
+			]
+		]);
+        $entities['ArmorName']->setPlatformModel('amazon', $weapon_name_model);
+        $entities['ArmorName']->setPlatformModel('dialogflow', $weapon_name_model);
+		
+		return $entities;
 	}
 
 	protected function _initIntents()
@@ -329,6 +363,113 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						public function createComponent($properties, $service)
 						{
 							return new \Convo\Pckg\Destiny\Elements\EquipItemElement(
+								$properties, $this->_destinyApiFactory
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Elements\TransferItemElement',
+				'Transfer Item Element',
+				'Transfers an item between your character and your vault',
+				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
+					'access_token' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Access Token',
+						'description' => 'Access token needed to identify requests that need OAuth authorization',
+						'valueType' => 'string'
+					],
+					'membership_type' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership Type',
+						'description' => 'Membership type for the chosen profile',
+						'valueType' => 'string'
+					],
+					'character_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character ID',
+						'description' => 'Character ID that you wish to manage equipment for',
+						'valueType' => 'string'
+					],
+					'item' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Item',
+						'description' => 'Item object to transfer. Needs to have the properties base.itemHash and base.itemInstanceId',
+						'valueType' => 'string'
+					],
+					'transfer_to_vault' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Transfer to Vault',
+						'description' => 'If true, transfers the item from the character to the vault. If false, does the opposite.',
+						'valueType' => 'string'
+					],
+					'error_message_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'errorMsg',
+						'name' => 'Error Message Name',
+						'description' => 'If an error occurrs, make it available in scope under this name.',
+						'valueType' => 'string'
+					],
+					'ok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'OK',
+						'description' => 'Runs when a given item has been sucessfully transferred',
+						'valueType' => 'class'
+					],
+					'nok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Not OK',
+						'description' => 'Runs when the given item could not be transferred',
+						'valueType' => 'class'
+					],
+					'_workflow' => 'read',
+					'_factory' => new class ($this->_destinyApiFactory) implements IComponentFactory
+					{
+						private $_destinyApiFactory;
+
+						public function __construct($destinyApiFactory)
+						{
+							$this->_destinyApiFactory = $destinyApiFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new \Convo\Pckg\Destiny\Elements\TransferItemElement(
 								$properties, $this->_destinyApiFactory
 							);
 						}

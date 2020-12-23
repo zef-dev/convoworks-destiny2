@@ -3,7 +3,7 @@
     "author": "ZEF Development",
     "email": "marko@zefdev.com",
     "source_for": [
-        "components", "intents"
+        "components", "intents", "entities"
     ],
     "description": "Interact with and manipulate Bungie's Destiny 2 API."
 }
