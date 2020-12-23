@@ -130,17 +130,14 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
         /** @var \Convo\Pckg\Destiny\Api\CharacterApi $char_api */
         $char_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
-
-        /** @var \Convo\Pckg\Destiny\Api\ItemApi $item_api */
-        // $item_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
         
         $membership_type = $this->evaluateString($this->_membershipType);
-        // $membership_id = $this->evaluateString($this->_membershipId);
         $character_id = $this->evaluateString($this->_characterId);
 
         /** @var array $profile_inventory */
         $profile_inventory = $this->evaluateString($this->_profileInventory);
         $this->_logger->debug('Got ['.count($profile_inventory).'] profile inventory items');
+        
         /** @var array $char_inventory */
         $char_inventory = $this->evaluateString($this->_characterInventory);
         $this->_logger->debug('Got ['.count($char_inventory).'] character inventory items');
@@ -214,7 +211,6 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         }
 
         try {
-            
             if (count($items) > 1)
             {
                 // duplicates
@@ -229,6 +225,12 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
                     $character_id,
                     $membership_type
                 );
+
+                foreach ($this->_ok as $ok) {
+                    $ok->read($request, $response);
+                }
+    
+                return;
             }
             else if (count($items) === 0)
             {
@@ -242,12 +244,6 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
     
                 return;
             }
-
-            foreach ($this->_ok as $ok) {
-                $ok->read($request, $response);
-            }
-
-            return;
         } catch (\Exception $e) {
             $this->_logger->error($e);
 
