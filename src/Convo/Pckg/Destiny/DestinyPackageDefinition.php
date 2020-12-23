@@ -667,7 +667,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
-						'name' => 'Character inventory',
+						'name' => 'Profile Inventory',
 						'description' => 'Collection of items in the profile inventory (including the vault).',
 						'valueType' => 'string'
 					],
