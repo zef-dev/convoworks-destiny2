@@ -402,6 +402,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Name under which to store duplicate item instance IDs',
 						'valueType' => 'string'
 					],
+					'error_message_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'errorMsg',
+						'name' => 'Error Message Name',
+						'description' => 'If an error occurrs, make it available in scope under this name.',
+						'valueType' => 'string'
+					],
 					'ok' => [
 						'editor_type' => 'service_components',
 						'editor_properties' => [
@@ -530,6 +538,35 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Collection of items in the character\'s inventory.',
 						'valueType' => 'string'
 					],
+					'duplicate_items_scope' => [
+						'editor_type' => 'select',
+						'editor_properties' => [
+							'multiple' => false,
+							'options' => [
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+							]
+						],
+						'defaultValue' => 'session',
+						'name' => 'Duplicate Items Scope',
+						'description' => 'Scope under which to store duplicate item instance IDs, if found',
+						'valueType' => 'string'
+					],
+					'duplicate_items_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Storage Name',
+						'description' => 'Name under which to store duplicate item instance IDs',
+						'valueType' => 'string'
+					],
+					'error_message_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'errorMsg',
+						'name' => 'Error Message Name',
+						'description' => 'If an error occurrs, make it available in scope under this name.',
+						'valueType' => 'string'
+					],
 					'ok' => [
 						'editor_type' => 'service_components',
 						'editor_properties' => [
@@ -541,6 +578,19 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'defaultOpen' => true,
 						'name' => 'OK',
 						'description' => 'Runs when a given item has been sucessfully transferred',
+						'valueType' => 'class'
+					],
+					'duplicates_found' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Duplicates Found',
+						'description' => 'Runs when duplicate items with the same name have been found. Will not transfer anything.',
 						'valueType' => 'class'
 					],
 					'nok' => [
