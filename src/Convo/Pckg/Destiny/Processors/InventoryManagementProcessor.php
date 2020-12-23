@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Convo\Pckg\Destiny\Processors;
 
@@ -33,13 +35,18 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
     private $_accessToken;
 
     /**
-	 * @var \Convo\Core\Workflow\IConversationElement[]
-	 */
+     * @var \Convo\Core\Workflow\IConversationElement[]
+     */
     private $_ok;
 
     /**
-	 * @var \Convo\Core\Workflow\IConversationElement[]
-	 */
+     * @var \Convo\Core\Workflow\IConversationElement[]
+     */
+    private $_duplicatesFound;
+
+    /**
+     * @var \Convo\Core\Workflow\IConversationElement[]
+     */
     private $_nok;
 
     private $_profileInventory;
@@ -47,6 +54,9 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
     private $_membershipType;
     private $_characterId;
+
+    private $_duplicateItemsScope;
+    private $_duplicateItemsName;
 
     private $_errorMessageName;
 
@@ -60,18 +70,23 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         $this->_destinyApiFactory = $destinyApiFactory;
 
         if (!isset($properties['api_key']) || empty($properties['api_key'])) {
-            throw new \Exception('Missing API key in ['.$this.']');
+            throw new \Exception('Missing API key in [' . $this . ']');
         }
         $this->_apiKey = $properties['api_key'];
 
         if (!isset($properties['access_token']) || empty($properties['access_token'])) {
-            throw new \Exception('Missing access token in ['.$this.']');
+            throw new \Exception('Missing access token in [' . $this . ']');
         }
         $this->_accessToken = $properties['access_token'];
 
         $this->_ok = $properties['ok'] ?: [];
         foreach ($this->_ok as $ok) {
             $this->addChild($ok);
+        }
+
+        $this->_duplicatesFound = $properties['duplicates_found'] ?: [];
+        foreach ($this->_duplicatesFound as $df) {
+            $this->addChild($df);
         }
 
         $this->_nok = $properties['nok'] ?: [];
@@ -84,6 +99,9 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
         $this->_characterId = $properties['character_id'];
         $this->_membershipType = $properties['membership_type'];
+
+        $this->_duplicateItemsName = $properties['duplicate_items_name'];
+        $this->_duplicateItemsScope = $properties['duplicate_items_scope'];
 
         $this->_errorMessageName = $properties['error_message_name'];
 
@@ -115,14 +133,14 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
     public function process(IConvoRequest $request, IConvoResponse $response, IRequestFilterResult $result)
     {
         if (!is_a($request, '\Convo\Core\Workflow\IIntentAwareRequest')) {
-	        throw new \Exception('This processor requires IIntentAwareRequest environment');
+            throw new \Exception('This processor requires IIntentAwareRequest environment');
         }
-        
+
         /** @var \Convo\Core\Workflow\IIntentAwareRequest $request */
         $provider = $this->_packageProviderFactory->getProviderFromPackageIds($this->getService()->getPackageIds());
         $sys_intent = $provider->findPlatformIntent($request->getIntentName(), $request->getPlatformId());
 
-        $this->_logger->debug('Got sys intent ['.$sys_intent->getName().']['.$sys_intent.']');
+        $this->_logger->debug('Got sys intent [' . $sys_intent->getName() . '][' . $sys_intent . ']');
 
         // Get profile with component 102 will get inventory (this includes the vault)
         $api_key = $this->evaluateString($this->_apiKey);
@@ -130,17 +148,17 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
         /** @var \Convo\Pckg\Destiny\Api\CharacterApi $char_api */
         $char_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
-        
+
         $membership_type = $this->evaluateString($this->_membershipType);
         $character_id = $this->evaluateString($this->_characterId);
 
         /** @var array $profile_inventory */
         $profile_inventory = $this->evaluateString($this->_profileInventory);
-        $this->_logger->debug('Got ['.count($profile_inventory).'] profile inventory items');
-        
+        $this->_logger->debug('Got [' . count($profile_inventory) . '] profile inventory items');
+
         /** @var array $char_inventory */
         $char_inventory = $this->evaluateString($this->_characterInventory);
-        $this->_logger->debug('Got ['.count($char_inventory).'] character inventory items');
+        $this->_logger->debug('Got [' . count($char_inventory) . '] character inventory items');
 
         $vault = [];
 
@@ -165,71 +183,62 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         $items = [];
         if (!$result->isSlotEmpty('WeaponName')) {
             $item_name = strtolower($result->getSlotValue('WeaponName'));
-        }
-        else if (!$result->isSlotEmpty('ArmorName')) {
+        } else if (!$result->isSlotEmpty('ArmorName')) {
             $item_name = strtolower($result->getSlotValue('ArmorName'));
-        }
-        else {
+        } else {
             throw new \Exception('Could not determine item to transfer.');
         }
 
-        if ($sys_intent->getName() === 'TransferToVaultIntent')
-        {   
+        if ($sys_intent->getName() === 'TransferToVaultIntent') {
             // find item on character, send it to the vault
-            $this->_logger->debug('Handling TransferToVaultIntent with item ['.$item_name.']');
+            $this->_logger->debug('Handling TransferToVaultIntent with item [' . $item_name . ']');
 
             foreach ($on_char as $oci) {
                 $inventory_item_name = strtolower($oci['manifest']['displayProperties']['name']);
 
                 if (stripos($inventory_item_name, $item_name) !== false) {
-                    $this->_logger->debug('Found potential candidate with instance ID ['.$oci['base']['itemInstanceId'].']');
+                    $this->_logger->debug('Found potential candidate with instance ID [' . $oci['base']['itemInstanceId'] . ']');
                     $items[] = $oci;
                 }
             }
 
             $transfer_to_vault = true;
-        }
-        else if ($sys_intent->getName() === 'TransferToCharacterIntent')
-        {
+        } else if ($sys_intent->getName() === 'TransferToCharacterIntent') {
             // find item in the vault, check if player has enough space in destination bucket, and transfer
-            $this->_logger->debug('Handling TransferToCharacterIntent with item ['.$item_name.']');
+            $this->_logger->debug('Handling TransferToCharacterIntent with item [' . $item_name . ']');
 
-            foreach ($profile_inventory as $pii) {
-                $inventory_item_name = strtolower($pii['manifest']['displayProperties']['name']);
-            
+            foreach ($vault as $vi) {
+                $inventory_item_name = strtolower($vi['manifest']['displayProperties']['name']);
+
                 if (stripos($inventory_item_name, $item_name) !== false) {
-                    $this->_logger->debug('Found potential candidate with instance ID ['.$pii['base']['itemInstanceId'].']');
-                    $items[] = $pii;
+                    $this->_logger->debug('Found potential candidate with instance ID [' . $vi['base']['itemInstanceId'] . ']');
+                    $items[] = $vi;
                 }
             }
 
             $transfer_to_vault = false;
+        } else {
+            throw new \Exception('Got convo intent [' . $sys_intent . '] for [' . $request->getPlatformId() . '][' . $request->getIntentName() . '] but expected TransferToVaultIntent or TransferToCharacterIntent');
         }
-        else
+
+        if (count($items) > 1)
         {
-            throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().'] but expected TransferToVaultIntent or TransferToCharacterIntent');
-        }
+            // duplicate items with the same name found
+            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
 
-        try {
-            if (count($items) > 1)
-            {
-                // duplicate items with the same name found
-                $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            $name = $this->evaluateString($this->_duplicateItemsName);
+            $this->_logger->debug('Going to store duplicate items [' . print_r($items, true) . '] as [' . $this->_duplicateItemsScope . '.' . $name . ']');
 
-                $name = $this->evaluateString($this->_duplicateItemsName);
-                $this->_logger->debug('Going to store duplicate items ['.print_r($items, true).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
-                
-                $params->setServiceParam($name, $items);
-                $params->setServiceParam('transfer_to_vault', $transfer_to_vault);
+            $params->setServiceParam($name, $items);
+            $params->setServiceParam('transfer_to_vault', $transfer_to_vault);
 
-                foreach ($this->_duplicatesFound as $df) {
-                    $df->read($request, $response);
-                }
-
-                return;
+            foreach ($this->_duplicatesFound as $df) {
+                $df->read($request, $response);
             }
-            else if (count($items) === 1)
-            {
+        }
+        else if (count($items) === 1)
+        {
+            try {
                 $char_api->transferItem(
                     $items[0]['base']['itemHash'],
                     1,
@@ -242,45 +251,42 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
                 foreach ($this->_ok as $ok) {
                     $ok->read($request, $response);
                 }
-    
-                return;
-            }
-            else if (count($items) === 0)
-            {
-                $err_name = $this->evaluateString($this->_errorMessageName);
-                $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
-                $params->setServiceParam($err_name, "No item with that name found.");
+            } catch (\Exception $e) {
+                $this->_logger->error($e);
 
-                foreach ($this->_nok as $nok) {
-                    $nok->read($request, $response);
-                }
-    
-                return;
-            }
-        } catch (\Exception $e) {
-            $this->_logger->error($e);
+                if (method_exists($e, 'getResponse')) {
+                    // can get response
+                    $this->_logger->debug('Can get response off of error');
+                    $res = json_decode($e->getResponse()->getBody()->__toString(), true);
 
-            if (method_exists($e, 'getResponse')) {
-                // can get response
-                $this->_logger->debug('Can get response off of error');
-                $res = json_decode($e->getResponse()->getBody()->__toString(), true);
+                    $this->_logger->debug('Got response [' . print_r($res, true) . ']');
 
-                $this->_logger->debug('Got response ['.print_r($res, true).']');
+                    if (isset($res['Message'])) {
+                        $err_name = $this->evaluateString($this->_errorMessageName);
+                        $this->_logger->debug('Setting message [' . $res['Message'] . '] under the name [' . $err_name . ']');
 
-                if (isset($res['Message'])) {
-                    $err_name = $this->evaluateString($this->_errorMessageName);
-                    $this->_logger->debug('Setting message ['.$res['Message'].'] under the name ['.$err_name.']');
-
-                    $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
-                    $params->setServiceParam($err_name, $res['Message']);
+                        $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+                        $params->setServiceParam($err_name, $res['Message']);
+                    }
                 }
             }
 
             foreach ($this->_nok as $nok) {
                 $nok->read($request, $response);
             }
-
-            return;
         }
+        else
+        {
+            // none found
+            $err_name = $this->evaluateString($this->_errorMessageName);
+            $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+            $params->setServiceParam($err_name, "No item with that name found.");
+
+            foreach ($this->_nok as $nok) {
+                $nok->read($request, $response);
+            }
+        }
+
+        return;
     }
 }
