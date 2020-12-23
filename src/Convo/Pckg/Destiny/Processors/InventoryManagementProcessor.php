@@ -2,6 +2,7 @@
 
 namespace Convo\Pckg\Destiny\Processors;
 
+use Convo\Core\Params\IServiceParamsScope;
 use Convo\Core\Util\ArrayUtil;
 use Convo\Core\Workflow\IConversationProcessor;
 use Convo\Core\Workflow\IConvoRequest;
@@ -28,6 +29,9 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
      */
     private $_destinyApiFactory;
 
+    private $_apiKey;
+    private $_accessToken;
+
     /**
 	 * @var \Convo\Core\Workflow\IConversationElement[]
 	 */
@@ -42,11 +46,9 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
     private $_characterInventory;
 
     private $_membershipType;
-    private $_membershipId;
     private $_characterId;
 
-    private $_apiKey;
-    private $_accessToken;
+    private $_errorMessageName;
 
     public function __construct($properties, $packageProviderFactory, $destinyApiFactory, $service)
     {
@@ -82,7 +84,8 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
         $this->_characterId = $properties['character_id'];
         $this->_membershipType = $properties['membership_type'];
-        $this->_membershipId = $properties['membership_id'];
+
+        $this->_errorMessageName = $properties['error_message_name'];
 
         $this->_requestFilters = $this->_initFilters();
     }
@@ -178,51 +181,16 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
             // find item on character, send it to the vault
             $this->_logger->debug('Handling TransferToVaultIntent with item ['.$item_name.']');
 
-            foreach ($on_char as $on_char_item) {
-                $this->_logger->debug('Current item ['.print_r($on_char_item, true).']');
-                $inventory_item_name = strtolower($on_char_item['manifest']['displayProperties']['name']);
-            
-                $this->_logger->debug('Considering inventory item ['.$inventory_item_name.']');
+            foreach ($on_char as $oci) {
+                $inventory_item_name = strtolower($oci['manifest']['displayProperties']['name']);
 
                 if (stripos($inventory_item_name, $item_name) !== false) {
-                    $this->_logger->debug('Found potential candidate with instance ID ['.$on_char_item['base']['itemInstanceId'].']');
-                    $items[] = $on_char_item;
+                    $this->_logger->debug('Found potential candidate with instance ID ['.$oci['base']['itemInstanceId'].']');
+                    $items[] = $oci;
                 }
             }
 
-            try {
-                if (count($items) > 0)
-                {
-                    $char_api->transferItem(
-                        $items[0]['base']['itemHash'],
-                        1,
-                        true,
-                        $items[0]['base']['itemInstanceId'],
-                        $character_id,
-                        $membership_type
-                    );
-                    
-                    foreach ($this->_ok as $ok) {
-                        $ok->read($request, $response);
-                    }
-                }
-                else if (count($items) === 0)
-                {
-                    foreach ($this->_nok as $nok) {
-                        $nok->read($request, $response);
-                    }
-                }
-
-                return;
-            } catch (\Exception $e) {
-                $this->_logger->error($e);
-
-                foreach ($this->_nok as $nok) {
-                    $nok->read($request, $response);
-                }
-
-                return;
-            }
+            $transfer_to_vault = true;
         }
         else if ($sys_intent->getName() === 'TransferToCharacterIntent')
         {
@@ -232,44 +200,78 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
             foreach ($profile_inventory as $pii) {
                 $inventory_item_name = strtolower($pii['manifest']['displayProperties']['name']);
             
-                // $this->_logger->debug('Considering inventory item ['.$inventory_item_name.']');
-
                 if (stripos($inventory_item_name, $item_name) !== false) {
                     $this->_logger->debug('Found potential candidate with instance ID ['.$pii['base']['itemInstanceId'].']');
                     $items[] = $pii;
                 }
             }
 
-            try {
-                if (count($items) > 0) {
-                    $char_api->transferItem(
-                        $items[0]['base']['itemHash'],
-                        1,
-                        false,
-                        $items[0]['base']['itemInstanceId'],
-                        $character_id,
-                        $membership_type
-                    );
-                }
-
-                foreach ($this->_ok as $ok) {
-                    $ok->read($request, $response);
-                }
-
-                return;
-            } catch (\Exception $e) {
-                $this->_logger->error($e);
-
-                foreach ($this->_nok as $nok) {
-                    $nok->read($request, $response);
-                }
-
-                return;
-            }
+            $transfer_to_vault = false;
         }
         else
         {
             throw new \Exception( 'Got convo intent ['.$sys_intent.'] for ['.$request->getPlatformId().']['.$request->getIntentName().'] but expected TransferToVaultIntent or TransferToCharacterIntent');
+        }
+
+        try {
+            
+            if (count($items) > 1)
+            {
+                // duplicates
+            }
+            else if (count($items) === 1)
+            {
+                $char_api->transferItem(
+                    $items[0]['base']['itemHash'],
+                    1,
+                    $transfer_to_vault,
+                    $items[0]['base']['itemInstanceId'],
+                    $character_id,
+                    $membership_type
+                );
+            }
+            else if (count($items) === 0)
+            {
+                $err_name = $this->evaluateString($this->_errorMessageName);
+                $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+                $params->setServiceParam($err_name, "No item with that name found.");
+
+                foreach ($this->_nok as $nok) {
+                    $nok->read($request, $response);
+                }
+    
+                return;
+            }
+
+            foreach ($this->_ok as $ok) {
+                $ok->read($request, $response);
+            }
+
+            return;
+        } catch (\Exception $e) {
+            $this->_logger->error($e);
+
+            if (method_exists($e, 'getResponse')) {
+                // can get response
+                $this->_logger->debug('Can get response off of error');
+                $res = json_decode($e->getResponse()->getBody()->__toString(), true);
+
+                $this->_logger->debug('Got response ['.print_r($res, true).']');
+
+                if (isset($res['Message'])) {
+                    $err_name = $this->evaluateString($this->_errorMessageName);
+                    $this->_logger->debug('Setting message ['.$res['Message'].'] under the name ['.$err_name.']');
+
+                    $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+                    $params->setServiceParam($err_name, $res['Message']);
+                }
+            }
+
+            foreach ($this->_nok as $nok) {
+                $nok->read($request, $response);
+            }
+
+            return;
         }
     }
 }
