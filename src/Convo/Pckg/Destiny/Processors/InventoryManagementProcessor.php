@@ -170,7 +170,7 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
 
         $on_char = array_values(
             array_filter(
-                array_merge(
+                array_replace_recursive(
                     $char_inventory,
                     ArrayUtil::arrayDiffRecursive($profile_inventory, $vault)
                 ),
@@ -186,7 +186,15 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         } else if (!$result->isSlotEmpty('ArmorName')) {
             $item_name = strtolower($result->getSlotValue('ArmorName'));
         } else {
-            throw new \Exception('Could not determine item to transfer.');
+            $err_name = $this->evaluateString($this->_errorMessageName);
+            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            $params->setServiceParam($err_name, "Sorry, I don't know which item you meant. Please try again.");
+
+            foreach ($this->_nok as $nok) {
+                $nok->read($request, $response);
+            }
+
+            return;
         }
 
         if ($sys_intent->getName() === 'TransferToVaultIntent') {
@@ -269,10 +277,10 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
                         $params->setServiceParam($err_name, $res['Message']);
                     }
                 }
-            }
 
-            foreach ($this->_nok as $nok) {
-                $nok->read($request, $response);
+                foreach ($this->_nok as $nok) {
+                    $nok->read($request, $response);
+                }
             }
         }
         else
