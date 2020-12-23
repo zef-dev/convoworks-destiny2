@@ -96,17 +96,16 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 		}
 
         if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_INVENTORY, $this->_initComponents)) {
-        	// deserialize inventory
+			// deserialize inventory
+			$character['inventory'] = [];
 			$inventory = $res['Response']['inventory']['data']['items'];
 
 			$this->_logger->debug('Going to deserialize ['.count($inventory).'] inventory items');
 
-			$deserialized_inventory = [];
-
 			foreach ($inventory as $inventory_item) {
 				try {
 					$manifest = $iapi->getItemManifest($inventory_item['itemHash']);
-					$item = [
+					$ii = [
 						'base' => [
 							'itemHash' => $inventory_item['itemHash'],
 							'itemInstanceId' => $inventory_item['itemInstanceId'] ?? null,
@@ -117,38 +116,37 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 						]
 					];
 
-					$deserialized_inventory[] = $item;
+					$character['inventory'][] = $ii;
 				} catch (\Exception $e) {
 					$this->_logger->error($e);
 					continue;
 				}
 			}
 
-			$character['inventory'] = $deserialized_inventory;
-
 			$this->_logger->debug('Deserialized ['.count($character['inventory']).'] inventory items');
 		}
 
         if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_EQUIPMENT, $this->_initComponents)) {
-        	// deserialize equipment
+			// deserialize equipment
+			$character['equipment'] = [];
 			$equipment = $res['Response']['equipment']['data']['items'];
 
 			$this->_logger->debug('Going to deserialize ['.count($equipment).'] equipment items');
 
-			foreach ($equipment as $profile_item) {
+			foreach ($equipment as $equipment_item) {
 				try {
-					$manifest = $iapi->getItemManifest($profile_item['itemHash']);
-					$item = [
+					$manifest = $iapi->getItemManifest($equipment_item['itemHash']);
+					$eqi = [
 						'base' => [
-							'itemHash' => $profile_item['itemHash'],
-							'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
-							'bucketHash' => $profile_item['bucketHash'] ?? null
+							'itemHash' => $equipment_item['itemHash'],
+							'itemInstanceId' => $equipment_item['itemInstanceId'] ?? null,
+							'bucketHash' => $equipment_item['bucketHash'] ?? null
 						],
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
 					];
-					$character['equipment'][] = $item;
+					$character['equipment'][] = $eqi;
 				} catch (\Exception $e) {
 					$this->_logger->error($e);
 					continue;
@@ -159,6 +157,11 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 		}
 
 		if (in_array(BaseDestinyApi::COMPONENT_PROFILE_INVENTORY, $this->_initComponents)) {
+			// deserialize and separate profile inventory items
+			$character['vault'] = [];
+			$character['profile_inventory'] = [];
+			$character['full_profile_inventory'] = [];
+			
 			$profile_response = $capi->getUserProfile($mstp, $msid, [BaseDestinyApi::COMPONENT_PROFILE_INVENTORY], true);
 			$profile_items = $profile_response["Response"]["profileInventory"]["data"]["items"];
 
@@ -167,7 +170,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 			foreach ($profile_items as $profile_item) {
 				try {
 					$manifest = $iapi->getItemManifest($profile_item['itemHash']);
-					$item = [
+					$pi = [
 						'base' => [
 							'itemHash' => $profile_item['itemHash'],
 							'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
@@ -178,17 +181,21 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 						]
 					];
 
-					if ($item['base']['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
-						$character['vault'][] = $item;
+					if ($pi['base']['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
+						$character['vault'][] = $pi;
 					} else {
-						$character['profile_inventory'][] = $item;
+						$character['profile_inventory'][] = $pi;
 					}
 
-					$character['full_profile_inventory'][] = $item;
+					$character['full_profile_inventory'][] = $pi;
 				} catch (\Exception $e) {
 					$this->_logger->error($e);
 					continue;
 				}
+			}
+
+			if (count($character['vault']) + count($character['profile_inventory']) !== count($character['full_profile_inventory'])) {
+				throw new \Exception('Count for vault and profile inventory do not add up.');
 			}
 
 			$this->_logger->debug('Deserialized ['.count($character['profile_inventory']).'] profile inventory items not including ['.count($character['vault']).'] vault items');
