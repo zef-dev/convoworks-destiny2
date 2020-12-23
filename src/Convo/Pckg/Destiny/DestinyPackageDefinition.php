@@ -192,7 +192,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				$this->getNamespace(),
 				'\Convo\Pckg\Destiny\Elements\ItemInstanceElement',
 				'Item Instance Element',
-				'Takes an item instance ID (or IDs), and deserializes them to make them available to use in the service\'s scope',
+				'Takes an item instance ID, and deserializes it to make it available to use in the service\'s scope',
 				[
 					'scope_type' => [
 						'editor_type' => 'select',
@@ -247,12 +247,12 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Membership ID for the chosen profile',
 						'valueType' => 'string'
 					],
-					'item_instance_ids' => [
+					'item_instance_id' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
-						'name' => 'Item Instance IDs',
-						'description' => 'One or more item instace IDs to deserialize',
+						'name' => 'Item Instance ID',
+						'description' => 'Item instace ID to deserialize',
 						'valueType' => 'string'
 					],
 					'_workflow' => 'read',
