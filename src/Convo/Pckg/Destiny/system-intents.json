@@ -158,6 +158,22 @@
                         ]
                     },
                     {
+                        "raw": "transfer The Prospector to the vault",
+                        "model": [
+                            {
+                                "text": "transfer"
+                            },
+                            {
+                                "text": "The Prospector",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "to the vault"
+                            }
+                        ]
+                    },
+                    {
                         "raw": "place Night Watch in my vault",
                         "model": [
                             {
@@ -167,6 +183,22 @@
                                 "text": "Night Watch",
                                 "type": "@convo-destiny.WeaponName",
                                 "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "in my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "place Heart of Inmost Light in my vault",
+                        "model": [
+                            {
+                                "text": "place"
+                            },
+                            {
+                                "text": "Heart of Inmost Light",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
                             },
                             {
                                 "text": "in my vault"
@@ -186,6 +218,70 @@
                             },
                             {
                                 "text": "in the vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put Duality in the vault",
+                        "model": [
+                            {
+                                "text": "put"
+                            },
+                            {
+                                "text": "Duality",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "in the vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put Phobos Warden Cowl in my vault",
+                        "model": [
+                            {
+                                "text": "put"
+                            },
+                            {
+                                "text": "Phobos Warden Cowl",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "in my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put Eriana's Vow in my vault",
+                        "model": [
+                            {
+                                "text": "put"
+                            },
+                            {
+                                "text": "Eriana's Vow",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "in my vault"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "transfer Felwinter's Helm to my vault",
+                        "model": [
+                            {
+                                "text": "transfer"
+                            },
+                            {
+                                "text": "Felwinter's Helm",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "to my vault"
                             }
                         ]
                     },
