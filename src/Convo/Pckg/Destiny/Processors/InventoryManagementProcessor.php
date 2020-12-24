@@ -168,17 +168,20 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
             }
         }
 
-        $on_char = array_values(
-            array_filter(
-                array_replace_recursive(
-                    $char_inventory,
-                    ArrayUtil::arrayDiffRecursive($profile_inventory, $vault)
-                ),
-                function ($item) {
-                    return isset($item['manifest']['displayProperties']['name']);
-                }
-            )
-        );
+        // TODO: Later down the line we'll be able to transfer things besides weapons and armor.
+        // $on_char = array_values(
+        //     array_filter(
+        //         array_replace_recursive(
+        //             $char_inventory,
+        //             ArrayUtil::arrayDiffRecursive($profile_inventory, $vault)
+        //         ),
+        //         function ($item) {
+        //             return isset($item['manifest']['displayProperties']['name']);
+        //         }
+        //     )
+        // );
+
+        $on_char = $char_inventory;
 
         $items = [];
         if (!$result->isSlotEmpty('WeaponName')) {
