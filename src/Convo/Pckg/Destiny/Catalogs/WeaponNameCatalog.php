@@ -6,11 +6,13 @@ use Convo\Pckg\Destiny\Api\BaseDestinyApi;
 use Convo\Core\Util\StrUtil;
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
+use Convo\Pckg\Destiny\Service\DestinyManifestService;
 
 class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
     const CATALOG_VERSION = "4";
 
+    private $_basePath;
     /**
      * @var \Convo\Core\Util\IHttpFactory
      */
@@ -20,8 +22,9 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
 
     private $_manifestDb;
 
-    public function __construct($logger, $httpFactory, $apiKey)
+    public function __construct($basePath, $logger, $httpFactory, $apiKey)
     {
+        $this->_basePath = $basePath;
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;
         $this->_apiKey = $apiKey;
@@ -34,7 +37,7 @@ class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Cor
 
     public function getCatalogValues($platform)
     {
-        $mservice = new \Convo\Pckg\Destiny\Service\DestinyManifestService($this->_logger, $this->_httpFactory);
+        $mservice = new DestinyManifestService($this->_basePath, $this->_logger, $this->_httpFactory);
         $api_key = $this->evaluateString($this->_apiKey);
         $this->_manifestDb = $mservice->initManifest($api_key);
 

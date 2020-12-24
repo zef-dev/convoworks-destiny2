@@ -12,6 +12,8 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 {
 	const NAMESPACE = 'convo-destiny';
 
+	private $_basePath;
+
 	/**
 	 * @var \Convo\Core\Util\IHttpFactory
 	 */
@@ -28,12 +30,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 	private $_destinyApiFactory;
 
 	public function __construct(
+		$basePath,
 		\Psr\Log\LoggerInterface $logger,
 		\Convo\Core\Util\IHttpFactory $httpFactory,
 		\Convo\Core\Factory\PackageProviderFactory $packageProviderFactory,
 		\Convo\Pckg\Destiny\Api\DestinyApiFactory $destinyApiFactory
 	)
 	{
+		$this->_basePath = $basePath;
 		$this->_httpFactory = $httpFactory;
 		$this->_packageProviderFactory = $packageProviderFactory;
 		$this->_destinyApiFactory = $destinyApiFactory;
@@ -795,13 +799,15 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 					),
 					'_class_aliases' => ['\Convo\Pckg\Destiny\Catalogs\WeaponNameCatalog'],
 					'_workflow' => 'datasource',
-					'_factory' => new class ($this->_logger, $this->_httpFactory) implements IComponentFactory
+					'_factory' => new class ($this->_basePath, $this->_logger, $this->_httpFactory) implements IComponentFactory
 					{
+						private $_basePath;
 						private $_logger;
 						private $_httpFactory;
 
-						public function __construct($logger, $httpFactory)
+						public function __construct($basePath, $logger, $httpFactory)
 						{
+							$this->_basePath = $basePath;
 							$this->_logger = $logger;
 							$this->_httpFactory = $httpFactory;
 						}
@@ -810,6 +816,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						{
 							$ctx = new \Convo\Pckg\Destiny\Catalogs\WeaponNameContext(
 								'WeaponNameCatalog',
+								$this->_basePath,
 								$this->_logger,
 								$this->_httpFactory,
 								$properties
@@ -842,13 +849,15 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 					),
 					'_class_aliases' => ['\Convo\Pckg\Destiny\Catalogs\ArmorNameCatalog'],
 					'_workflow' => 'datasource',
-					'_factory' => new class ($this->_logger, $this->_httpFactory) implements IComponentFactory
+					'_factory' => new class ($this->_basePath, $this->_logger, $this->_httpFactory) implements IComponentFactory
 					{
+						private $_basePath;
 						private $_logger;
 						private $_httpFactory;
 
-						public function __construct($logger, $httpFactory)
+						public function __construct($basePath, $logger, $httpFactory)
 						{
+							$this->_basePath = $basePath;
 							$this->_logger = $logger;
 							$this->_httpFactory = $httpFactory;
 						}
@@ -857,6 +866,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						{
 							$ctx = new \Convo\Pckg\Destiny\Catalogs\ArmorNameContext(
 								'ArmorNameCatalog',
+								$this->_basePath,
 								$this->_logger,
 								$this->_httpFactory,
 								$properties

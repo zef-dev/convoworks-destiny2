@@ -6,6 +6,7 @@ use Convo\Pckg\Destiny\Api\BaseDestinyApi;
 
 class DestinyManifestService
 {
+	private $_basePath;
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -16,8 +17,9 @@ class DestinyManifestService
      */
     private $_httpFactory;
 
-    public function __construct($logger, $httpFactory)
+    public function __construct($basePath, $logger, $httpFactory)
     {
+		$this->_basePath = $basePath;
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;    
     }
@@ -35,7 +37,7 @@ class DestinyManifestService
 
 		$this->_logger->debug('Fetching manifest from ['.$url.']');
 
-		$client = $this->_httpFactory->getHttpClient();
+		$client = $this->_httpFactory->getHttpClient(['timeout' => 30]);
 		$manifest_request = $this->_httpFactory->buildRequest('GET', $url,
 		[
 			'X-API-key' => $apiKey,
@@ -45,7 +47,9 @@ class DestinyManifestService
 		$manifest_response = $client->sendRequest($manifest_request);
 
 		$en_manifest_db_path = json_decode($manifest_response->getBody()->__toString())->Response->mobileWorldContentPaths->en;
-		$cacheFilePath = 'cache/'.pathinfo($en_manifest_db_path, PATHINFO_BASENAME);
+		$cacheFilePath = $this->_basePath.'/cache/'.pathinfo($en_manifest_db_path, PATHINFO_BASENAME);
+
+		$this->_logger->debug('Checking cache file path ['.$cacheFilePath.']');
 
 		if (file_exists($cacheFilePath.'.zip'))
 		{
@@ -63,7 +67,7 @@ class DestinyManifestService
 			$en_manifest_db_res = $client->sendRequest($en_manifest_db_req);
 	
 			if (!file_exists(dirname($cacheFilePath))) {
-				mkdir(dirname($cacheFilePath), 0777, true);
+				mkdir(dirname($cacheFilePath), 0744, true);
 			}
 	
 			file_put_contents($cacheFilePath.'.zip', $en_manifest_db_res->getBody()->__toString());
@@ -71,7 +75,7 @@ class DestinyManifestService
 
 		$zip = new \ZipArchive();
 		if ($zip->open($cacheFilePath.'.zip') === TRUE) {
-			$zip->extractTo('cache');
+			$zip->extractTo(dirname($cacheFilePath));
 			$zip->close();
 		}
 

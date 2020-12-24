@@ -9,6 +9,8 @@ class DestinyApiFactory
 	const API_TYPE_CHARACTER = 'character';
 	const API_TYPE_ITEM = 'item';
 
+	private $_basePath;
+
 	/**
 	 * @var \Psr\Log\LoggerInterface
 	 */
@@ -26,8 +28,9 @@ class DestinyApiFactory
 
 	private $_manifestDb;
 
-	public function __construct($logger, $httpFactory, $cache)
+	public function __construct($basePath, $logger, $httpFactory, $cache)
 	{
+		$this->_basePath = $basePath;
 		$this->_logger = $logger;
 		$this->_httpFactory = $httpFactory;
 		$this->_cache = $cache;
@@ -43,7 +46,7 @@ class DestinyApiFactory
 	public function getApi($type, $apiKey, $accessToken)
 	{
 		if (!$this->_manifestDb) {
-			$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
+			$mservice = new DestinyManifestService($this->_basePath, $this->_logger, $this->_httpFactory);
 			$this->_manifestDb = $mservice->initManifest($apiKey);
 		}
 

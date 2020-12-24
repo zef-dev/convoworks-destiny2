@@ -12,6 +12,8 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 {
 	const CATALOG_VERSION = "3";
 
+	private $_basePath;
+
 	/**
 	 * @var \Convo\Core\Util\IHttpFactory
 	 */
@@ -21,8 +23,9 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 
 	private $_apiKey;
 
-	public function __construct($logger, $httpFactory, $apiKey)
+	public function __construct($basePath, $logger, $httpFactory, $apiKey)
 	{
+		$this->_basePath = $basePath;
 		$this->_logger = $logger;
 		$this->_httpFactory = $httpFactory;
 		$this->_apiKey = $apiKey;
@@ -35,7 +38,7 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 
 	public function getCatalogValues($platform)
 	{
-		$mservice = new DestinyManifestService($this->_logger, $this->_httpFactory);
+		$mservice = new DestinyManifestService($this->_basePath, $this->_logger, $this->_httpFactory);
 		$api_key = $this->evaluateString($this->_apiKey);
 		$this->_manifestDb = $mservice->initManifest($api_key);
 

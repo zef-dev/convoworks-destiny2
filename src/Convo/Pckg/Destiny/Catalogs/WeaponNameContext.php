@@ -6,6 +6,8 @@ use Convo\Core\Workflow\AbstractWorkflowComponent;
 
 class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core\Workflow\IServiceContext
 {
+    private $_basePath;
+
     /**
      * @var \Psr\Log\LoggerInterface
      */
@@ -25,10 +27,12 @@ class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core
 
     private $_apiKey;
 
-    public function __construct($catalogName, $logger, $httpFactory, $properties)
+    public function __construct($catalogName, $basePath, $logger, $httpFactory, $properties)
     {
         $this->_componentId = $catalogName;
         
+        $this->_basePath = $basePath;
+
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;
 
@@ -42,7 +46,7 @@ class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core
     public function init()
     {
         $this->_logger->debug('WeaponNameContext init');
-        $this->_catalog = new WeaponNameCatalog($this->_logger, $this->_httpFactory, $this->_apiKey);
+        $this->_catalog = new WeaponNameCatalog($this->_basePath, $this->_logger, $this->_httpFactory, $this->_apiKey);
         $this->_catalog->setParent($this->getService());
         $this->_catalog->setService($this->getService());
     }
