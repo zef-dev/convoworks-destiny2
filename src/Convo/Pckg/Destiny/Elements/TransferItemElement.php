@@ -87,7 +87,7 @@ class TransferItemElement extends AbstractWorkflowContainerComponent implements 
                 boolval($this->evaluateString($this->_transferToVault)),
                 $item['base']['itemInstanceId'],
                 $this->evaluateString($this->_characterId),
-                $this->evaluateString($this->_membershipType),
+                $this->evaluateString($this->_membershipType)
             );
 
             foreach ($this->_ok as $ok) {
