@@ -98,7 +98,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
         if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_INVENTORY, $this->_initComponents)) {
 			// deserialize inventory
 			$character['inventory'] = [];
-			$inventory = $res['Response']['inventory']['data']['items'];
+			$inventory = $res['Response']['inventory']['data']['items'] ?? [];
 
 			$this->_logger->debug('Going to deserialize ['.count($inventory).'] inventory items');
 
@@ -129,7 +129,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
         if (in_array(BaseDestinyApi::COMPONENT_CHARACTER_EQUIPMENT, $this->_initComponents)) {
 			// deserialize equipment
 			$character['equipment'] = [];
-			$equipment = $res['Response']['equipment']['data']['items'];
+			$equipment = $res['Response']['equipment']['data']['items'] ?? [];
 
 			$this->_logger->debug('Going to deserialize ['.count($equipment).'] equipment items');
 
@@ -163,7 +163,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 			$character['full_profile_inventory'] = [];
 			
 			$profile_response = $capi->getUserProfile($mstp, $msid, [BaseDestinyApi::COMPONENT_PROFILE_INVENTORY], true);
-			$profile_items = $profile_response["Response"]["profileInventory"]["data"]["items"];
+			$profile_items = $profile_response['Response']['profileInventory']['data']['items'] ?? [];
 
 			$this->_logger->debug('Going to deserialize ['.count($profile_items).'] profile items');
 
