@@ -31,6 +31,8 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
 
     public function __construct($properties, $destinyApiFactory)
     {
+        parent::__construct($properties);
+
         $this->_destinyApiFactory = $destinyApiFactory;
 
         if (!isset($properties['api_key'])) {

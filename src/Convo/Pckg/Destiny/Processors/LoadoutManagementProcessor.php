@@ -12,7 +12,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 {
     public function __construct($properties)
     {
-        
+        parent::__construct($properties);
     }
 
     private function _initFilters()

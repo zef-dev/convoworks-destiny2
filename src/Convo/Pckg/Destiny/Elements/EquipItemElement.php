@@ -36,6 +36,8 @@ class EquipItemElement extends AbstractWorkflowContainerComponent implements ICo
 
     public function __construct($properties, $destinyApiFactory)
     {
+        parent::__construct($properties);
+        
         $this->_destinyApiFactory = $destinyApiFactory;
 
         $this->_ok = $properties['ok'] ?: [];
