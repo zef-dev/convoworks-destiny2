@@ -155,19 +155,53 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             foreach ($this->_nok as $nok) {
                 $nok->read($request, $response);
             }
+
+            return;
         }
 
         if ($sys_intent->getName() === 'EquipWeaponIntent')
         {   
-            // find item
-            $item_name = strtolower($result->getSlotValue('WeaponName'));
-            $this->_logger->debug('Handling EquipWeaponIntent with weapon ['.$item_name.']');
+            if ($result->isSlotEmpty('WeaponName'))
+            {
+                $this->_logger->warning('No item name to handle.');
+
+                // none found
+                $err_name = $this->evaluateString($this->_errorMessageName);
+                $params = $this->getService()->getServiceParams('session');
+                $params->setServiceParam($err_name, "Sorry, I couldn't quite understand which item you meant. Please try again.");
+
+                foreach ($this->_nok as $nok) {
+                    $nok->read($request, $response);
+                }
+            }
+            else
+            {
+                // find item
+                $item_name = strtolower($result->getSlotValue('WeaponName'));
+                $this->_logger->debug('Handling EquipWeaponIntent with weapon ['.$item_name.']');
+            }
         }
         else if ($sys_intent->getName() === 'EquipArmorIntent')
         {
-            // find item
-            $item_name = strtolower($result->getSlotValue('ArmorName'));
-            $this->_logger->debug('Handling EquipArmorIntent with armor ['.$item_name.']');
+            if ($result->isSlotEmpty('ArmorName'))
+            {
+                $this->_logger->warning('No item name to handle.');
+
+                // none found
+                $err_name = $this->evaluateString($this->_errorMessageName);
+                $params = $this->getService()->getServiceParams('session');
+                $params->setServiceParam($err_name, "Sorry, I couldn't quite understand which item you meant. Please try again.");
+
+                foreach ($this->_nok as $nok) {
+                    $nok->read($request, $response);
+                }
+            }
+            else
+            {
+                // find item
+                $item_name = strtolower($result->getSlotValue('ArmorName'));
+                $this->_logger->debug('Handling EquipArmorIntent with armor ['.$item_name.']');
+            }
         }
         else
         {
