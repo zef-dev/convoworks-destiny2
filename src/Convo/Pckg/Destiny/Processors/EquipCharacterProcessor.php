@@ -143,6 +143,20 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         $char_id = $this->evaluateString($this->_characterId);
         $membership_type = $this->evaluateString($this->_membershipType);
 
+        if ($result->isSlotEmpty('WeaponName') && $result->isSlotEmpty('ArmorName'))
+        {
+            $this->_logger->warning('No item name to handle.');
+
+            // none found
+            $err_name = $this->evaluateString($this->_errorMessageName);
+            $params = $this->getService()->getServiceParams('session');
+            $params->setServiceParam($err_name, "Sorry, I couldn't quite understand which item you meant. Please try again.");
+
+            foreach ($this->_nok as $nok) {
+                $nok->read($request, $response);
+            }
+        }
+
         if ($sys_intent->getName() === 'EquipWeaponIntent')
         {   
             // find item
