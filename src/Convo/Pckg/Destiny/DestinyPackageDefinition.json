@@ -5,5 +5,6 @@
     "source_for": [
         "components", "intents", "entities"
     ],
-    "description": "Interact with and manipulate Bungie's Destiny 2 API."
+    "description": "Interact with and manipulate Bungie's Destiny 2 API.",
+    "stability": "experimental"
 }
