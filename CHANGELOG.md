@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.7 - 2021-03-27
+
+* Use `convoworks-core` v0.21
+
 ## 1.0.5 - 2021-02-19
 
 Quickfix
