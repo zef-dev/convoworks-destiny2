@@ -9,9 +9,9 @@
         "destiny"
     ],
     "license" : "MIT",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "require" : {
-        "php" : "^7.2",
+        "php" : "^7.2.5",
 		"psr/log" : "^1.1.0",
         "zef-dev/convoworks-core" : "^0.21"
     },
