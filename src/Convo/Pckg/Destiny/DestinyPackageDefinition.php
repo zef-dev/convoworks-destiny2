@@ -77,6 +77,29 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 		return $entities;
 	}
 
+	public function getFunctions()
+	{
+		$functions = [];
+
+		$functions[] = new ExpressionFunction(
+			'is_gear',
+			function ($item) {
+				return sprintf('is_gear(%1$i)', $item);
+			},
+			function($args, $item) {
+				return in_array($item['bucketHash'], array_merge(
+					DestinyBucketEnum::EQUIPPABLE_GEAR,
+					[
+						DestinyBucketEnum::BUCKET_GHOST_SHELL,
+						DestinyBucketEnum::BUCKET_SUBCLASS
+					]
+				));
+			}
+		);
+
+		return $functions;
+	}
+
 	protected function _initIntents()
 	{
 		return $this->_loadIntents(__DIR__.'/system-intents.json');
