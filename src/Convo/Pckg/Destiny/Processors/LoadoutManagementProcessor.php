@@ -159,6 +159,9 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         /** @var \Convo\Pckg\Destiny\Api\CharacterApi $character_api */
         $character_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
 
+        /** @var \Convo\Pckg\Destiny\Api\ItemApi $item_api */
+        $item_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
+
         $char_id = $this->evaluateString($this->_characterId);
         $membership_id = $this->evaluateString($this->_membershipId);
         $membership_type = $this->evaluateString($this->_membershipType);
@@ -175,7 +178,13 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         ];
         foreach ($equipment as $item) {
             if ($this->_shouldStoreInLoadout($item)) {
-                $loadout['items'][] = $item['itemInstanceId'];
+                $manifest = $item_api->getItemManifest($item['itemHash']);
+
+                $loadout['items'][] = [
+                    'instance_id' => $item['itemInstanceId'],
+                    'name' => $manifest['displayProperties']['name'],
+                    'is_exotic' => $manifest['inventory']['tierTypeName'] === 'Exotic'
+                ];
             }
         }
 
@@ -221,7 +230,24 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $membership_type = $this->evaluateString($this->_membershipType);
 
         try {
-            $character_api->equipItems($loadout['items'], $char_id, $membership_type);
+            $items = $loadout['items'];
+            usort($items, function ($itemA, $itemB) {
+                if ($itemA['is_exotic'] && $itemB['is_exotic']) {
+                    return 0;
+                }
+                
+                if ($itemA['is_exotic'] && !$itemB['is_exotic']) {
+                    return 1;
+                }
+                
+                if (!$itemA['is_exotic'] && $itemB['is_exotic']) {
+                    return -1;
+                }
+            });
+
+            $items = array_map(function ($item) { return $item['instance_id']; }, $items);
+
+            $character_api->equipItems($items, $char_id, $membership_type);
         } catch (\Exception $e) {
             $this->_readErrorFlow($request, $response, "Something went wrong while equipping loadout \"$loadoutName\".");
             return;
