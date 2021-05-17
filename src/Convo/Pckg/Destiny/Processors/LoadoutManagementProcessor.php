@@ -147,7 +147,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
         
         if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', '{"loadouts":[],"tags":[]}');
+            $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
         }
 
         $data = json_decode($params->getServiceParam('stored_gear'), true);
@@ -191,7 +191,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $loadouts[$loadoutName] = $loadout;
         $data['loadouts'] = $loadouts;
 
-        $params->setServiceParam('stored_gear', json_encode($data));
+        $params->setServiceParam('stored_gear', $data);
 
         $this->_logger->info('Loadout saved. Reading OK flow.');
 
@@ -205,12 +205,12 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
 
         if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', '{"loadouts":[],"tags":[]}');
+            $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
             $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
             return;
         }
 
-        $data = json_decode($params->getServiceParam('stored_gear'), true);
+        $data = $params->getServiceParam('stored_gear');
         $loadouts = $data['loadouts'];
 
         if (!isset($loadouts[$loadoutName])) {
