@@ -149,9 +149,6 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         if (!$params->getServiceParam('stored_gear')) {
             $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
         }
-
-        $data = $params->getServiceParam('stored_gear');
-        $loadouts = $data['loadouts'];
         
         $api_key = $this->evaluateString($this->_apiKey);
         $acc_tkn = $this->evaluateString($this->_accessToken);
@@ -172,6 +169,9 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 
         $equipment = $char['Response']['equipment']['data']['items'] ?: [];
 
+        $data = $params->getServiceParam('stored_gear');
+        $loadouts = $data['loadouts'][$char_id];
+
         $loadout = [
             'name' => $loadoutName,
             'items' => []
@@ -189,7 +189,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         }
 
         $loadouts[$loadoutName] = $loadout;
-        $data['loadouts'] = $loadouts;
+        $data['loadouts'][$char_id] = $loadouts;
 
         $params->setServiceParam('stored_gear', $data);
 
@@ -210,16 +210,6 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
             return;
         }
 
-        $data = $params->getServiceParam('stored_gear');
-        $loadouts = $data['loadouts'];
-
-        if (!isset($loadouts[$loadoutName])) {
-            $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
-            return;
-        }
-
-        $loadout = $loadouts[$loadoutName];
-
         $api_key = $this->evaluateString($this->_apiKey);
         $acc_tkn = $this->evaluateString($this->_accessToken);
 
@@ -228,6 +218,16 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 
         $char_id = $this->evaluateString($this->_characterId);
         $membership_type = $this->evaluateString($this->_membershipType);
+
+        $data = $params->getServiceParam('stored_gear');
+        $loadouts = $data['loadouts'][$char_id];
+
+        if (!isset($loadouts[$loadoutName])) {
+            $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
+            return;
+        }
+
+        $loadout = $loadouts[$loadoutName];
 
         try {
             $items = $loadout['items'];
