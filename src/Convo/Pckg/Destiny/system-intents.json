@@ -1,4 +1,221 @@
 {
+    "EquipLoadoutIntent": [
+        {
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
+            "definition": {
+                "name": "EquipLoadoutIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "equip my PVE loadout",
+                        "model": [
+                            {
+                                "text": "equip my"
+                            },
+                            {
+                                "text": "PVE",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip PVP loadout",
+                        "model": [
+                            {
+                                "text": "equip"
+                            },
+                            {
+                                "text": "PVP",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on my farming loadout",
+                        "model": [
+                            {
+                                "text": "put on my"
+                            },
+                            {
+                                "text": "farming",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on rocket launcher loadout",
+                        "model": [
+                            {
+                                "text": "put on"
+                            },
+                            {
+                                "text": "rocket launcher",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "get me my gambit loadout",
+                        "model": [
+                            {
+                                "text": "get me my"
+                            },
+                            {
+                                "text": "gambit",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "SaveLoadoutIntent": [
+        {
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
+            "definition": {
+                "name": "SaveLoadoutIntent",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "save as PVE loadout",
+                        "model": [
+                            {
+                                "text": "save as"
+                            },
+                            {
+                                "text": "PVE",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "save as my PVE loadout",
+                        "model": [
+                            {
+                                "text": "save as my"
+                            },
+                            {
+                                "text": "PVE",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "save this as PVE loadout",
+                        "model": [
+                            {
+                                "text": "save this as"
+                            },
+                            {
+                                "text": "PVE",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "save this as my PVE loadout",
+                        "model": [
+                            {
+                                "text": "save this as my"
+                            },
+                            {
+                                "text": "PVE",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "store this as PVP loadout",
+                        "model": [
+                            {
+                                "text": "store this as"
+                            },
+                            {
+                                "text": "PVP",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "make new loadout called farming",
+                        "model": [
+                            {
+                                "text": "make new loadout called"
+                            },
+                            {
+                                "text": "farming",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "I want this to be gambit loadout",
+                        "model": [
+                            {
+                                "text": "I want this to be"
+                            },
+                            {
+                                "text": "gambit",
+                                "type": "@convo-core.any",
+                                "slot_value": "LoadoutName"
+                            },
+                            {
+                                "text": "loadout"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
     "EquipWeaponIntent": [
         {
             "platforms": [
