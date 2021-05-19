@@ -150,7 +150,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
             $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
         }
 
-        $data = json_decode($params->getServiceParam('stored_gear'), true);
+        $data = $params->getServiceParam('stored_gear');
         $loadouts = $data['loadouts'];
         
         $api_key = $this->evaluateString($this->_apiKey);
