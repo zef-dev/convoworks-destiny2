@@ -195,8 +195,8 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
             }
         }
 
-        $loadouts[$loadoutName] = $loadout;
-        $data['loadouts'][$char_id] = $loadouts;
+        $loadouts[] = $loadout;
+        $data['loadouts'][$char_id] = array_values($loadouts);
 
         $params->setServiceParam('stored_gear', $data);
 
@@ -236,17 +236,23 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $character_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
 
         $data = $params->getServiceParam('stored_gear');
-        $loadouts = $data['loadouts'][$char_id];
+        $loadouts = array_values($data['loadouts'][$char_id]);
+        $found = false;
 
-        if (!isset($loadouts[$loadoutName])) {
+        foreach ($loadouts as $loadout) {
+            if ($loadout['name'] === $loadoutName) {
+                $found = $loadout;
+                break;
+            }
+        }
+
+        if (!$found) {
             $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
             return;
         }
 
-        $loadout = $loadouts[$loadoutName];
-
         try {
-            $items = $loadout['items'];
+            $items = $found['items'];
             usort($items, function ($itemA, $itemB) {
                 if ($itemA['is_exotic'] && $itemB['is_exotic']) {
                     return 0;
