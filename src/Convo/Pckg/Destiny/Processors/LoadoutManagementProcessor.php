@@ -146,8 +146,19 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
     {
         $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
         
+        $char_id = $this->evaluateString($this->_characterId);
+        $membership_id = $this->evaluateString($this->_membershipId);
+        $membership_type = $this->evaluateString($this->_membershipType);
+
         if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
+            $params->setServiceParam('stored_gear', 
+                [
+                    "loadouts" => [
+                        $char_id => []
+                    ],
+                    "tags" => []
+                ]
+            );
         }
         
         $api_key = $this->evaluateString($this->_apiKey);
@@ -158,10 +169,6 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 
         /** @var \Convo\Pckg\Destiny\Api\ItemApi $item_api */
         $item_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_ITEM, $api_key, $acc_tkn);
-
-        $char_id = $this->evaluateString($this->_characterId);
-        $membership_id = $this->evaluateString($this->_membershipId);
-        $membership_type = $this->evaluateString($this->_membershipType);
 
         $char = $character_api->getCharacter(
             $membership_type, $membership_id, $char_id, [BaseDestinyApi::COMPONENT_CHARACTER_EQUIPMENT]
@@ -204,9 +211,21 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
     {
         $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
 
+        $char_id = $this->evaluateString($this->_characterId);
+        $membership_type = $this->evaluateString($this->_membershipType);
+
         if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', ["loadouts" => [], "tags" => []]);
+            $params->setServiceParam('stored_gear', 
+                [
+                    "loadouts" => [
+                        $char_id => []
+                    ],
+                    "tags" => []
+                ]
+            );
+
             $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
+            
             return;
         }
 
@@ -215,9 +234,6 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 
         /** @var \Convo\Pckg\Destiny\Api\CharacterApi $character_api */
         $character_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
-
-        $char_id = $this->evaluateString($this->_characterId);
-        $membership_type = $this->evaluateString($this->_membershipType);
 
         $data = $params->getServiceParam('stored_gear');
         $loadouts = $data['loadouts'][$char_id];
