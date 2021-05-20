@@ -177,7 +177,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $equipment = $char['Response']['equipment']['data']['items'] ?: [];
 
         $data = $params->getServiceParam('stored_gear');
-        $loadouts = $data['loadouts'][$char_id];
+        $loadouts = $data['loadouts'][$char_id] ?? [];
 
         $loadout = [
             'name' => $loadoutName,
