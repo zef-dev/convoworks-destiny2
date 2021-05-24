@@ -134,15 +134,6 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 
         $this->_logger->debug('Got sys intent ['.$sys_intent->getName().']['.$sys_intent.']');
 
-        $character_api = $this->_destinyApiFactory->getApi(
-            DestinyApiFactory::API_TYPE_CHARACTER,
-            $this->evaluateString($this->_apiKey),
-            $this->evaluateString($this->_accessToken)
-        );
-
-        $char_id = $this->evaluateString($this->_characterId);
-        $membership_type = $this->evaluateString($this->_membershipType);
-
         if ($result->isSlotEmpty('WeaponName') && $result->isSlotEmpty('ArmorName'))
         {
             $this->_logger->warning('No item name to handle.');
