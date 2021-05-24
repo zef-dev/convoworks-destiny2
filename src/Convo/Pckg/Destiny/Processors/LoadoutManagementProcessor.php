@@ -150,15 +150,15 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $membership_id = $this->evaluateString($this->_membershipId);
         $membership_type = $this->evaluateString($this->_membershipType);
 
-        if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', 
-                [
-                    "loadouts" => [
-                        $char_id => []
-                    ],
-                    "tags" => []
-                ]
-            );
+        $stored_gear = $params->getServiceParam('stored_gear') ?? [];
+
+        if (!isset($stored_gear[$char_id])) {
+            $stored_gear[$char_id] = [
+                "loadouts" => [],
+                "tags" => []
+            ];
+
+            $params->setServiceParam('stored_gear', $stored_gear);
         }
         
         $api_key = $this->evaluateString($this->_apiKey);
@@ -177,12 +177,13 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $equipment = $char['Response']['equipment']['data']['items'] ?: [];
 
         $data = $params->getServiceParam('stored_gear');
-        $loadouts = $data['loadouts'][$char_id] ?? [];
+        $loadouts = $data[$char_id]['loadouts'] ?? [];
 
         $loadout = [
             'name' => $loadoutName,
             'items' => []
         ];
+
         foreach ($equipment as $item) {
             if ($this->_shouldStoreInLoadout($item)) {
                 $manifest = $item_api->getItemManifest($item['itemHash']);
@@ -196,7 +197,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         }
 
         $loadouts[] = $loadout;
-        $data['loadouts'][$char_id] = array_values($loadouts);
+        $data[$char_id]['loadouts'] = array_values($loadouts);
 
         $params->setServiceParam('stored_gear', $data);
 
@@ -214,18 +215,21 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $char_id = $this->evaluateString($this->_characterId);
         $membership_type = $this->evaluateString($this->_membershipType);
 
-        if (!$params->getServiceParam('stored_gear')) {
-            $params->setServiceParam('stored_gear', 
-                [
-                    "loadouts" => [
-                        $char_id => []
-                    ],
-                    "tags" => []
-                ]
-            );
+        $stored_gear = $params->getServiceParam('stored_gear');
+
+        if (!$stored_gear) {
+            $stored_gear = [];
+        }
+
+        if (!isset($stored_gear[$char_id])) {
+            $stored_gear[$char_id] = [
+                "loadouts" => [],
+                "tags" => []
+            ];
+
+            $params->setServiceParam('stored_gear', $stored_gear);
 
             $this->_readErrorFlow($request, $response, "Sorry, you don't have a loadout saved under the name \"$loadoutName\".");
-            
             return;
         }
 
@@ -237,7 +241,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
 
         $data = $params->getServiceParam('stored_gear');
         $loadouts = array_values($data['loadouts'][$char_id]);
-        $found = false;
+        $found = null;
 
         foreach ($loadouts as $loadout) {
             if ($loadout['name'] === $loadoutName) {
