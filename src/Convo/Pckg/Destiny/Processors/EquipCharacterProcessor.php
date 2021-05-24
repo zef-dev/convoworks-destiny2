@@ -229,6 +229,15 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
 
         $this->_logger->debug('Final item IDs to consider ['.print_r($item_ids, true).']');
 
+        $character_api = $this->_destinyApiFactory->getApi(
+            DestinyApiFactory::API_TYPE_CHARACTER,
+            $this->evaluateString($this->_apiKey),
+            $this->evaluateString($this->_accessToken)
+        );
+
+        $char_id = $this->evaluateString($this->_characterId);
+        $membership_type = $this->evaluateString($this->_membershipType);
+
         if (count($item_ids) > 1)
         {
             // duplicate items with the same name found
