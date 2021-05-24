@@ -58,12 +58,6 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
     public function read(IConvoRequest $request, IConvoResponse $response)
     {
 		$params = $this->getService()->getServiceParams($this->_scopeType);
-		// $key = $this->evaluateString($this->_storageName);
-
-		// if ($params->getServiceParam($key) !== null) { // TODO: store timestamp and check for expiry
-		// 	$this->_logger->debug('Data already set. Will not bust cache yet.');
-		// 	return;
-		// }
 
     	$api_key = $this->evaluateString($this->_apiKey);
     	$acc_tkn = $this->evaluateString($this->_accessToken);
@@ -106,11 +100,9 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$manifest = $iapi->getItemManifest($inventory_item['itemHash']);
 					$ii = [
-						'base' => [
-							'itemHash' => $inventory_item['itemHash'],
-							'itemInstanceId' => $inventory_item['itemInstanceId'] ?? null,
-							'bucketHash' => $inventory_item['bucketHash'] ?? null
-						],
+						'itemHash' => $inventory_item['itemHash'],
+						'itemInstanceId' => $inventory_item['itemInstanceId'] ?? null,
+						'bucketHash' => $inventory_item['bucketHash'] ?? null,
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
@@ -137,11 +129,9 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$manifest = $iapi->getItemManifest($equipment_item['itemHash']);
 					$eqi = [
-						'base' => [
-							'itemHash' => $equipment_item['itemHash'],
-							'itemInstanceId' => $equipment_item['itemInstanceId'] ?? null,
-							'bucketHash' => $equipment_item['bucketHash'] ?? null
-						],
+						'itemHash' => $equipment_item['itemHash'],
+						'itemInstanceId' => $equipment_item['itemInstanceId'] ?? null,
+						'bucketHash' => $equipment_item['bucketHash'] ?? null,
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
@@ -171,11 +161,9 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 				try {
 					$manifest = $iapi->getItemManifest($profile_item['itemHash']);
 					$pi = [
-						'base' => [
-							'itemHash' => $profile_item['itemHash'],
-							'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
-							'bucketHash' => $profile_item['bucketHash'] ?? null
-						],
+						'itemHash' => $profile_item['itemHash'],
+						'itemInstanceId' => $profile_item['itemInstanceId'] ?? null,
+						'bucketHash' => $profile_item['bucketHash'] ?? null,
 						'manifest' => [
 							'displayProperties' => ['name' => $manifest['displayProperties']['name']]
 						]
