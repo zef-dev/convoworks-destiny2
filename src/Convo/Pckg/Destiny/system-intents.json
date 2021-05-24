@@ -663,5 +663,144 @@
                 ]
             }
         }
+    ],
+    "TagItemIntent": [
+        {
+            "platforms": [
+                "amazon", "dialogflow"
+            ],
+            "definition": {
+                "name": "TagItemIntent",
+                "utterances": [
+                    {
+                        "raw": "set my current Borrowed Time as main smg",
+                        "model": [
+                            {
+                                "text": "set my current"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Borrowed Time",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "main smg",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "mark this Vesper of Radius as the ultimate useless exotic",
+                        "model": [
+                            {
+                                "text": "mark this"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Vesper of Radius",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "the ultimate useless exotic",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "tag my Helm of Saint Fourteen as custom name",
+                        "model": [
+                            {
+                                "text": "tag my"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Helm of Saint Fourteen",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "custom name",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "set my current Phoenix Cradle as rocket launcher cradle",
+                        "model": [
+                            {
+                                "text": "set my current"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Phoenix Cradle",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "rocket launcher cradle",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "mark this Waking Vigil as main PVP vigil",
+                        "model": [
+                            {
+                                "text": "mark this"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Waking Vigil",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "main PVP vigil",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "tag my Night Watch as PVE scout",
+                        "model": [
+                            {
+                                "text": "tag my"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Night Watch",
+                                "slot_value": "ItemName"
+                            },
+                            {
+                                "text": "as"
+                            },
+                            {
+                                "type": "@convo-core.any",
+                                "text": "PVE scout",
+                                "slot_value": "ItemTag"
+                            }
+                        ]
+                    }
+                ],
+                "type": "custom"
+            }
+        }
     ]
 }
