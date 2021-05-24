@@ -169,7 +169,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 						]
 					];
 
-					if ($pi['base']['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
+					if ($pi['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
 						$character['vault'][] = $pi;
 					} else {
 						$character['profile_inventory'][] = $pi;
@@ -193,7 +193,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 			$character['gear'] = [];
 		}
 		$character['gear'] = array_filter(array_merge($character['gear'], $character['inventory']), function($item) {
-			return isset($item['base']['bucketHash']) && in_array($item['base']['bucketHash'], DestinyBucketEnum::EQUIPPABLE_GEAR);
+			return isset($item['bucketHash']) && in_array($item['bucketHash'], DestinyBucketEnum::EQUIPPABLE_GEAR);
 		});
 
         $params->setServiceParam($storage_name, $character);
