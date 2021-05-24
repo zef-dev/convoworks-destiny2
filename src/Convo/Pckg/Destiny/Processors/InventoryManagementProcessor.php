@@ -162,7 +162,7 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         $vault = [];
 
         foreach ($profile_inventory as $profile_inventory_item) {
-            if ($profile_inventory_item['base']['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
+            if ($profile_inventory_item['bucketHash'] === DestinyBucketEnum::BUCKET_VAULT) {
                 $vault[] = $profile_inventory_item;
             }
         }
@@ -207,7 +207,7 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
                 $inventory_item_name = strtolower($oci['manifest']['displayProperties']['name']);
 
                 if (stripos($inventory_item_name, $item_name) !== false) {
-                    $this->_logger->debug('Found potential candidate with instance ID [' . $oci['base']['itemInstanceId'] . ']');
+                    $this->_logger->debug('Found potential candidate with instance ID [' . $oci['itemInstanceId'] . ']');
                     $items[] = $oci;
                 }
             }
@@ -221,7 +221,7 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
                 $inventory_item_name = strtolower($vi['manifest']['displayProperties']['name']);
 
                 if (stripos($inventory_item_name, $item_name) !== false) {
-                    $this->_logger->debug('Found potential candidate with instance ID [' . $vi['base']['itemInstanceId'] . ']');
+                    $this->_logger->debug('Found potential candidate with instance ID [' . $vi['itemInstanceId'] . ']');
                     $items[] = $vi;
                 }
             }
@@ -250,10 +250,10 @@ class InventoryManagementProcessor extends AbstractServiceProcessor implements I
         {
             try {
                 $char_api->transferItem(
-                    $items[0]['base']['itemHash'],
+                    $items[0]['itemHash'],
                     1,
                     $transfer_to_vault,
-                    $items[0]['base']['itemInstanceId'],
+                    $items[0]['itemInstanceId'],
                     $character_id,
                     $membership_type
                 );

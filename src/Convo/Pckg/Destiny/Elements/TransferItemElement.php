@@ -84,10 +84,10 @@ class TransferItemElement extends AbstractWorkflowContainerComponent implements 
 
         try {
             $char_api->transferItem(
-                $item['base']['itemHash'],
+                $item['itemHash'],
                 1,
                 boolval($this->evaluateString($this->_transferToVault)),
-                $item['base']['itemInstanceId'],
+                $item['itemInstanceId'],
                 $this->evaluateString($this->_characterId),
                 $this->evaluateString($this->_membershipType)
             );

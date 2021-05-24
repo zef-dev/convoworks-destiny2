@@ -213,8 +213,8 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
             $this->_logger->debug('Considering inventory item ['.$inventory_item_name.']');
 
             if (stripos($inventory_item_name, $item_name) !== false) {
-                $this->_logger->debug('Found potential candidate with instance ID ['.$item['base']['itemInstanceId'].']');
-                $item_ids[] = $item['base']['itemInstanceId'];
+                $this->_logger->debug('Found potential candidate with instance ID ['.$item['itemInstanceId'].']');
+                $item_ids[] = $item['itemInstanceId'];
             }
         }
 
