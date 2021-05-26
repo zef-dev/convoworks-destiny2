@@ -858,7 +858,7 @@
                 "dialogflow"
             ],
             "definition": {
-                "name": "EquipFavorite",
+                "name": "EquipFavoriteIntent",
                 "type": "custom",
                 "utterances": [
                     {
