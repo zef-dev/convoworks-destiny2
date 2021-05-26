@@ -169,7 +169,7 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
                 continue;
             }
 
-            $equipment_name = strtolower(trim($item['displayProperties']['name']));
+            $equipment_name = strtolower(trim($item['manifest']['displayProperties']['name']));
 
             if ($equipment_name === $itemName) {
                 $this->_logger->info('Found equipped item ['.$equipment_name.']');
