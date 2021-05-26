@@ -240,7 +240,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         $character_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $acc_tkn);
 
         $data = $params->getServiceParam('stored_gear');
-        $loadouts = array_values($data['loadouts'][$char_id]);
+        $loadouts = array_values($data[$char_id]["loadouts"]);
         $found = null;
 
         foreach ($loadouts as $loadout) {
