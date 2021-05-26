@@ -10,6 +10,7 @@ use Convo\Core\Workflow\IRequestFilterResult;
 use Convo\Pckg\Core\Filters\ConvoIntentReader;
 use Convo\Pckg\Core\Filters\IntentRequestFilter;
 use Convo\Pckg\Core\Processors\AbstractServiceProcessor;
+use Convo\Pckg\Destiny\Api\DestinyApiFactory;
 use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 
 class TagItemProcessor extends AbstractServiceProcessor implements IConversationProcessor
@@ -26,6 +27,9 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
     private $_apiKey;
     private $_accessToken;
+
+    private $_characterId;
+    private $_membershipType;
 
     /**
      * @var \Convo\Core\Workflow\IConversationElement[]
@@ -59,6 +63,9 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
             throw new \Exception('Missing access token');
         }
         $this->_accessToken = $properties['access_token'];
+
+        $this->_characterId = $properties['character_id'];
+        $this->_membershipType = $properties['membership_type'];
 
         $this->_packageProviderFactory = $packageProviderFactory;
         $this->_destinyApiFactory = $destinyApiFactory;
@@ -117,23 +124,24 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
         $this->_logger->debug('Got sys intent ['.$sys_intent->getName().']['.$sys_intent.']');
 
+        $item_name = $result->getSlotValue('WeaponName') ?? $result->getSlotValue('ArmorName');
+
         switch ($sys_intent->getName())
         {
             case 'FavoriteItemIntent':
-                $item_name = $result->getSlotValue('WeaponName') ?? $result->getSlotValue('ArmorName');
                 $this->_logger->info('Going to favorite ['.$item_name.']');
                 $this->_favoriteItem(
                     $request, $response,
                     $item_name
                 );
                 break;
-            // case 'EquipTagIntent':
-            //     $this->_logger->info('Going to equip item tagged ['.$item_tag.']');
-            //     $this->_equipTaggedItem(
-            //         $request, $response,
-            //         $item_tag
-            //     );
-            //     break;
+            case 'EquipFavorite':
+                $this->_logger->info('Going to equip favorite ['.$item_name.']');
+                $this->_equipFavoriteItem(
+                    $request, $response,
+                    $item_name
+                );
+                break;
             default:
                 $this->_readErrorFlow($request, $response, "Sorry, I couldn't quite understand what you meant. Please try again.");
 
@@ -192,9 +200,43 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
         }
     }
 
-    private function _equipTaggedItem(IConvoRequest $request, IConvoResponse $response, $itemTag)
+    private function _equipFavoriteItem(IConvoRequest $request, IConvoResponse $response, $itemName)
     {
-        
+        $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
+
+        $char_id = $this->evaluateString($this->_characterId);
+
+        $stored_gear = $params->getServiceParam('stored_gear') ?? [];
+
+        if (!isset($stored_gear[$char_id])) {
+            $stored_gear[$char_id] = [
+                "loadouts" => [],
+                "favorites" => []
+            ];
+
+            $params->setServiceParam('stored_gear', $stored_gear);
+        }
+
+        if (!isset($stored_gear[$char_id]["favorites"][$itemName])) {
+            $this->_readErrorFlow($request, $response, 'Sorry, you don\'t have a favorite '.$itemName.'.');
+            return;
+        }
+
+        $api_key = $this->evaluateString($this->_apiKey);
+        $access_token = $this->evaluateString($this->_accessToken);
+
+        $char_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $access_token);
+
+        $membership_type = $this->evaluateString($this->_membershipType);
+
+        $char_api->equipItem(
+            $stored_gear[$char_id]["favorites"][$itemName],
+            $char_id, $membership_type
+        );
+
+        foreach ($this->_ok as $ok) {
+            $ok->read($request, $response);
+        }
     }
 
     private function _readErrorFlow(IConvoRequest $request, IConvoResponse $response, $message)
