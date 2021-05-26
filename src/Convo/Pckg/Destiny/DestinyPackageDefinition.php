@@ -932,28 +932,20 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'description' => 'Access token needed to identify requests that need OAuth authorization',
 						'valueType' => 'string'
 					],
-					'membership_type' => [
-						'editor_type' => 'text',
-						'editor_properties' => [],
-						'defaultValue' => null,
-						'name' => 'Membership Type',
-						'description' => 'Membership type for the chosen profile',
-						'valueType' => 'string'
-					],
-					'membership_id' => [
-						'editor_type' => 'text',
-						'editor_properties' => [],
-						'defaultValue' => null,
-						'name' => 'Membership ID',
-						'description' => 'Membership ID for the chosen profile',
-						'valueType' => 'string'
-					],
 					'character_id' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
 						'defaultValue' => null,
 						'name' => 'Character ID',
 						'description' => 'Character ID that you wish to manage tags for',
+						'valueType' => 'string'
+					],
+					'membership_type' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership Type',
+						'description' => 'Membership type for the chosen profile',
 						'valueType' => 'string'
 					],
 					'error_message_name' => [
