@@ -96,12 +96,12 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
         $fav_item_reader->setLogger($this->_logger);
         $fav_item_reader->setService($this->getService());
 
-        // $equip_tag_reader = new ConvoIntentReader(['intent' => 'convo-destiny.EquipTagIntent'], $this->_packageProviderFactory);
-        // $equip_tag_reader->setLogger($this->_logger);
-        // $equip_tag_reader->setService($this->getService());
+        $equip_fav_reader = new ConvoIntentReader(['intent' => 'convo-destiny.EquipFavoriteIntent'], $this->_packageProviderFactory);
+        $equip_fav_reader->setLogger($this->_logger);
+        $equip_fav_reader->setService($this->getService());
 
         $config = [
-            'readers' => [$fav_item_reader, /*$equip_tag_reader*/]
+            'readers' => [$fav_item_reader, $equip_fav_reader]
         ];
 
         $intent_filter = new IntentRequestFilter($config);
