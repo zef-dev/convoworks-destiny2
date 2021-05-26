@@ -124,7 +124,20 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
         $this->_logger->debug('Got sys intent ['.$sys_intent->getName().']['.$sys_intent.']');
 
-        $item_name = $result->getSlotValue('WeaponName') ?? $result->getSlotValue('ArmorName');
+        try {
+            $item_name = $result->getSlotValue('WeaponName');
+        } catch (\Exception $e) {
+            $this->_logger->info($e->getMessage());
+
+            try {
+                $item_name = $result->getSlotValue('ArmorName');
+            } catch (\Exception $e) {
+                $this->_logger->error($e);
+
+                $this->_readErrorFlow($request, $response, 'I couldn\'t determine which item you meant. Please try again later.');
+                return;
+            }
+        }
 
         switch ($sys_intent->getName())
         {
@@ -135,7 +148,7 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
                     $item_name
                 );
                 break;
-            case 'EquipFavorite':
+            case 'EquipFavoriteIntent':
                 $this->_logger->info('Going to equip favorite ['.$item_name.']');
                 $this->_equipFavoriteItem(
                     $request, $response,
@@ -203,6 +216,8 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
     private function _equipFavoriteItem(IConvoRequest $request, IConvoResponse $response, $itemName)
     {
         $params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_INSTALLATION);
+
+        $itemName = strtolower(trim($itemName));
 
         $char_id = $this->evaluateString($this->_characterId);
 
