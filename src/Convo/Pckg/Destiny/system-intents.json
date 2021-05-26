@@ -850,5 +850,123 @@
                 "type": "custom"
             }
         }
+    ],
+    "EquipFavoriteIntent": [
+        {
+            "platforms": [
+                "amazon",
+                "dialogflow"
+            ],
+            "definition": {
+                "name": "EquipFavorite",
+                "type": "custom",
+                "utterances": [
+                    {
+                        "raw": "put on favorite Falling Guillotine",
+                        "model": [
+                            {
+                                "text": "put on favorite"
+                            },
+                            {
+                                "text": "Falling Guillotine",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip favorite Witherhoard",
+                        "model": [
+                            {
+                                "text": "equip favorite"
+                            },
+                            {
+                                "text": "Witherhoard",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on my favorite Seventh Seraph Officer Revolver",
+                        "model": [
+                            {
+                                "text": "put on my favorite"
+                            },
+                            {
+                                "text": "Seventh Seraph Officer Revolver",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip my favorite Patron of Lost Causes",
+                        "model": [
+                            {
+                                "text": "equip my favorite"
+                            },
+                            {
+                                "text": "Patron of Lost Causes",
+                                "type": "@convo-destiny.WeaponName",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on favorite Iron Will Bond",
+                        "model": [
+                            {
+                                "text": "put on favorite"
+                            },
+                            {
+                                "text": "Iron Will Bond",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip favorite Ophidian Aspect",
+                        "model": [
+                            {
+                                "text": "equip favorite"
+                            },
+                            {
+                                "text": "Ophidian Aspect",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "put on my favorite Heiro Camo",
+                        "model": [
+                            {
+                                "text": "put on my favorite"
+                            },
+                            {
+                                "text": "Heiro Camo",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "equip my favorite Wild Hunt Vestment",
+                        "model": [
+                            {
+                                "text": "equip my favorite"
+                            },
+                            {
+                                "text": "Wild Hunt Vestment",
+                                "type": "@convo-destiny.ArmorName",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
     ]
 }
