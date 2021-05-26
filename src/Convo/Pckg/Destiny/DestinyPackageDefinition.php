@@ -912,6 +912,121 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 			),
 			new ComponentDefinition(
 				$this->getNamespace(),
+				'\Convo\Pckg\Destiny\Processors\TagItemProcessor',
+				'Item Tags Processor',
+				'Tag and equip your favorite items',
+				[
+					'api_key' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'API Key',
+						'description' => 'API key used to make requests to the Destiny 2 API',
+						'valueType' => 'string'
+					],
+					'access_token' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Access Token',
+						'description' => 'Access token needed to identify requests that need OAuth authorization',
+						'valueType' => 'string'
+					],
+					'membership_type' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership Type',
+						'description' => 'Membership type for the chosen profile',
+						'valueType' => 'string'
+					],
+					'membership_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Membership ID',
+						'description' => 'Membership ID for the chosen profile',
+						'valueType' => 'string'
+					],
+					'character_id' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character ID',
+						'description' => 'Character ID that you wish to manage tags for',
+						'valueType' => 'string'
+					],
+					'error_message_name' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'errorMsg',
+						'name' => 'Error Message Name',
+						'description' => 'If an error occurrs, make it available in session scope under this name.',
+						'valueType' => 'string'
+					],
+					'equipment' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Character Equipment',
+						'description' => 'This should evaluate to an array of Bungie.net API compliant items that are currently equipped on the character.',
+						'valueType' => 'string'
+					],
+					'ok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'OK',
+						'description' => 'Runs when you tag an item or equip a tagged item',
+						'valueType' => 'class'
+					],
+					'nok' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => false,
+						'name' => 'Not OK',
+						'description' => 'Runs when an item could not be tagged or equipped',
+						'valueType' => 'class'
+					],
+					'_workflow' => 'process',
+					'_preview_angular' => array(
+                        'type' => 'html',
+                        'template' => '<div class="user-say">'.
+                            'User says: <b>"favorite my current Chroma Rush"</b>, <b>"favorite this Code Duello"</b>, <b>"equip my favorite Night Watch"</b>...'.
+                            '</div>'
+                    ),
+					'_factory' => new class ($this->_packageProviderFactory, $this->_destinyApiFactory) implements IComponentFactory
+					{
+						private $_packageProviderFactory;
+						private $_destinyApiFactory;
+
+						public function __construct($packageProviderFactory, $destinyApiFactory)
+						{
+							$this->_packageProviderFactory = $packageProviderFactory;
+							$this->_destinyApiFactory = $destinyApiFactory;
+						}
+
+						public function createComponent($properties, $service)
+						{
+							return new \Convo\Pckg\Destiny\Processors\TagItemProcessor(
+								$properties, $this->_packageProviderFactory, $this->_destinyApiFactory, $service
+							);
+						}
+					}
+				]
+			),
+			new ComponentDefinition(
+				$this->getNamespace(),
 				'\Convo\Pckg\Destiny\Catalogs\WeaponNameContext',
 				'Weapon Name Catalog',
 				'Use a catalog entity for weapon names (currently only available on Amazon Alexa)',

@@ -664,16 +664,16 @@
             }
         }
     ],
-    "TagItemIntent": [
+    "FavoriteItemIntent": [
         {
             "platforms": [
                 "amazon", "dialogflow"
             ],
             "definition": {
-                "name": "TagItemIntent",
+                "name": "FavoriteItemIntent",
                 "utterances": [
                     {
-                        "raw": "set my current Borrowed Time as main smg",
+                        "raw": "set my current Borrowed Time as my favorite",
                         "model": [
                             {
                                 "text": "set my current"
@@ -681,20 +681,31 @@
                             {
                                 "type": "@convo-destiny.WeaponName",
                                 "text": "Borrowed Time",
-                                "slot_value": "ItemName"
+                                "slot_value": "WeaponName"
                             },
                             {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "main smg",
-                                "slot_value": "ItemTag"
+                                "text": "as my favorite"
                             }
                         ]
                     },
                     {
-                        "raw": "mark this Vesper of Radius as the ultimate useless exotic",
+                        "raw": "set my current Ashen Wake as my favorite",
+                        "model": [
+                            {
+                                "text": "set my current"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Ashen Wake",
+                                "slot_value": "ArmorName"
+                            },
+                            {
+                                "text": "as my favorite"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "mark this Vesper of Radius as my favorite",
                         "model": [
                             {
                                 "text": "mark this"
@@ -702,20 +713,31 @@
                             {
                                 "type": "@convo-destiny.ArmorName",
                                 "text": "Vesper of Radius",
-                                "slot_value": "ItemName"
+                                "slot_value": "ArmorName"
                             },
                             {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "the ultimate useless exotic",
-                                "slot_value": "ItemTag"
+                                "text": "as my favorite"
                             }
                         ]
                     },
                     {
-                        "raw": "tag my Helm of Saint Fourteen as custom name",
+                        "raw": "mark this Crimson as my favorite",
+                        "model": [
+                            {
+                                "text": "mark this"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Crimson",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "as my favorite"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "tag my Helm of Saint Fourteen as favorite",
                         "model": [
                             {
                                 "text": "tag my"
@@ -723,78 +745,104 @@
                             {
                                 "type": "@convo-destiny.ArmorName",
                                 "text": "Helm of Saint Fourteen",
-                                "slot_value": "ItemName"
+                                "slot_value": "ArmorName"
                             },
                             {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "custom name",
-                                "slot_value": "ItemTag"
+                                "text": "as favorite"
                             }
                         ]
                     },
                     {
-                        "raw": "set my current Phoenix Cradle as rocket launcher cradle",
-                        "model": [
-                            {
-                                "text": "set my current"
-                            },
-                            {
-                                "type": "@convo-destiny.ArmorName",
-                                "text": "Phoenix Cradle",
-                                "slot_value": "ItemName"
-                            },
-                            {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "rocket launcher cradle",
-                                "slot_value": "ItemTag"
-                            }
-                        ]
-                    },
-                    {
-                        "raw": "mark this Waking Vigil as main PVP vigil",
-                        "model": [
-                            {
-                                "text": "mark this"
-                            },
-                            {
-                                "type": "@convo-destiny.WeaponName",
-                                "text": "Waking Vigil",
-                                "slot_value": "ItemName"
-                            },
-                            {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "main PVP vigil",
-                                "slot_value": "ItemTag"
-                            }
-                        ]
-                    },
-                    {
-                        "raw": "tag my Night Watch as PVE scout",
+                        "raw": "tag my Graviton Lance as favorite",
                         "model": [
                             {
                                 "text": "tag my"
                             },
                             {
                                 "type": "@convo-destiny.WeaponName",
+                                "text": "Graviton Lance",
+                                "slot_value": "WeaponName"
+                            },
+                            {
+                                "text": "as favorite"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite my current Phoenix Cradle",
+                        "model": [
+                            {
+                                "text": "favorite my current"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Phoenix Cradle",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite my current Friction Fire",
+                        "model": [
+                            {
+                                "text": "favorite my current"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Friction Fire",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite this Waking Vigil",
+                        "model": [
+                            {
+                                "text": "favorite this"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
+                                "text": "Waking Vigil",
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite this Actium War Rig",
+                        "model": [
+                            {
+                                "text": "favorite this"
+                            },
+                            {
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Actium War Rig",
+                                "slot_value": "ArmorName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite my Night Watch",
+                        "model": [
+                            {
+                                "text": "favorite my"
+                            },
+                            {
+                                "type": "@convo-destiny.WeaponName",
                                 "text": "Night Watch",
-                                "slot_value": "ItemName"
+                                "slot_value": "WeaponName"
+                            }
+                        ]
+                    },
+                    {
+                        "raw": "favorite my Gwisin Vest",
+                        "model": [
+                            {
+                                "text": "favorite my"
                             },
                             {
-                                "text": "as"
-                            },
-                            {
-                                "type": "@convo-core.any",
-                                "text": "PVE scout",
-                                "slot_value": "ItemTag"
+                                "type": "@convo-destiny.ArmorName",
+                                "text": "Gwisin Vest",
+                                "slot_value": "ArmorName"
                             }
                         ]
                     }

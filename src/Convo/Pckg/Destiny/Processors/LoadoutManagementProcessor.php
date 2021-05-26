@@ -155,7 +155,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         if (!isset($stored_gear[$char_id])) {
             $stored_gear[$char_id] = [
                 "loadouts" => [],
-                "tags" => []
+                "favorites" => []
             ];
 
             $params->setServiceParam('stored_gear', $stored_gear);
@@ -224,7 +224,7 @@ class LoadoutManagementProcessor extends AbstractServiceProcessor implements ICo
         if (!isset($stored_gear[$char_id])) {
             $stored_gear[$char_id] = [
                 "loadouts" => [],
-                "tags" => []
+                "favorites" => []
             ];
 
             $params->setServiceParam('stored_gear', $stored_gear);
