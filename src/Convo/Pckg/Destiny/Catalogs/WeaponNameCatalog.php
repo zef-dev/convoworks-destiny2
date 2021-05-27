@@ -10,7 +10,7 @@ use Convo\Pckg\Destiny\Service\DestinyManifestService;
 
 class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
-    const CATALOG_VERSION = "5";
+    const CATALOG_VERSION = "6";
 
     private $_basePath;
     /**

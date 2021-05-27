@@ -10,7 +10,7 @@ use Convo\Core\Workflow\AbstractWorkflowComponent;
 
 class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
 {
-	const CATALOG_VERSION = "4";
+	const CATALOG_VERSION = "5";
 
 	private $_basePath;
 
