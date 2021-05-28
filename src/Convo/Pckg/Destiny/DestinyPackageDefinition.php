@@ -953,7 +953,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'editor_properties' => [],
 						'defaultValue' => 'errorMsg',
 						'name' => 'Error Message Name',
-						'description' => 'If an error occurrs, make it available in session scope under this name.',
+						'description' => 'If an error occurs, make it available in session scope under this name.',
 						'valueType' => 'string'
 					],
 					'equipment' => [
