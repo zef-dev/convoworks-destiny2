@@ -287,13 +287,6 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
             }
         }
 
-        $api_key = $this->evaluateString($this->_apiKey);
-        $access_token = $this->evaluateString($this->_accessToken);
-
-        $char_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $access_token);
-
-        $membership_type = $this->evaluateString($this->_membershipType);
-
         if (count($found) === 0)
         {
             $this->_readErrorFlow($request, $response, "You don't have a favorite $itemName.");
@@ -301,9 +294,17 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
         }
         else if (count($found) === 1)
         {
+            $api_key = $this->evaluateString($this->_apiKey);
+            $access_token = $this->evaluateString($this->_accessToken);
+
+            $membership_type = $this->evaluateString($this->_membershipType);
+
+            /** @var \Convo\Pckg\Destiny\Api\CharacterApi $character_api */
+            $character_api = $this->_destinyApiFactory->getApi(DestinyApiFactory::API_TYPE_CHARACTER, $api_key, $access_token);
+
             try
             {
-                $char_api->equipItems(
+                $character_api->equipItems(
                     [$found[0]["itemInstanceId"]],
                     $char_id, $membership_type
                 );
