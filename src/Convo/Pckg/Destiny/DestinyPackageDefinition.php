@@ -99,6 +99,17 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 			}
 		);
 
+		$functions[] = new ExpressionFunction(
+			'bucket_hash_to_name',
+			function ($hash) {
+				return sprintf('bucket_name_to_hash(%1$h)', $hash);
+			},
+			function($args, $hash) {
+				$hash = intval($hash);
+				return isset(DestinyBucketEnum::BUCKET_NAME_MAP[$hash]) ? DestinyBucketEnum::BUCKET_NAME_MAP[$hash] : 'Unknown';
+			}
+		);
+
 		return $functions;
 	}
 
@@ -974,8 +985,50 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'defaultValue' => [],
 						'defaultOpen' => true,
 						'name' => 'OK',
-						'description' => 'Runs when you tag an item or equip a tagged item',
+						'description' => 'Runs when an item is favorited or equipped',
 						'valueType' => 'class'
+					],
+					'tag_favorite_duplicates' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'Tag Favorite Duplicates',
+						'description' => 'Runs when there\'s more than one item to mark as favorite',
+						'valueType' => 'class'
+					],
+					'tag_favorite_duplicates_storage' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'tag_favorite_duplicates',
+						'name' => 'Tag Favorite Duplicates Storage Name',
+						'description' => 'If there is more than one item with the name that the user wants to mark as favorite',
+						'valueType' => 'string'
+					],
+					'equip_favorite_duplicates' => [
+						'editor_type' => 'service_components',
+						'editor_properties' => [
+							'allow_interfaces' => ['\Convo\Core\Workflow\IConversationElement'],
+							'multiple' => true,
+							'hideWhenEmpty' => false
+						],
+						'defaultValue' => [],
+						'defaultOpen' => true,
+						'name' => 'Equip Favorite Duplicates',
+						'description' => 'Runs when there\'s more than one favorited item of the same name to equip',
+						'valueType' => 'class'
+					],
+					'equip_favorite_duplicates_storage' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => 'equip_favorite_duplicates',
+						'name' => 'Equip Favorite Duplicates Storage Name',
+						'description' => 'If the user wants to equip a favorite item, and there\'s more than one with the same name, store the duplicates under this name',
+						'valueType' => 'string'
 					],
 					'nok' => [
 						'editor_type' => 'service_components',
