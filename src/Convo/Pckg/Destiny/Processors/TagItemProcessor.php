@@ -39,6 +39,20 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
     /**
      * @var \Convo\Core\Workflow\IConversationElement[]
      */
+    private $_tagFavoriteDuplicates;
+
+    private $_tagFavoriteDuplicatesStorage;
+
+    /**
+     * @var \Convo\Core\Workflow\IConversationElement[]
+     */
+    private $_equipFavoriteDuplicates;
+
+    private $_equipFavoriteDuplicatesStorage;
+
+    /**
+     * @var \Convo\Core\Workflow\IConversationElement[]
+     */
     private $_nok;
 
     private $_equipment;
@@ -74,6 +88,18 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
         foreach ($this->_ok as $ok) {
             $this->addChild($ok);
         }
+
+        $this->_tagFavoriteDuplicates = $properties['tag_favorite_duplicates'] ?? [];
+        foreach ($this->_tagFavoriteDuplicates as $tag_dupe) {
+            $this->addChild($tag_dupe);
+        }
+        $this->_tagFavoriteDuplicatesStorage = $properties['tag_favorite_duplicates_storage'];
+
+        $this->_equipFavoriteDuplicates = $properties['equip_favorite_duplicates'] ?? [];
+        foreach ($this->_equipFavoriteDuplicates as $equip_dupe) {
+            $this->addChild($equip_dupe);
+        }
+        $this->_equipFavoriteDuplicatesStorage = $properties['equip_favorite_duplicates_storage'];
 
         $this->_nok = $properties['nok'] ?: [];
         foreach ($this->_nok as $nok) {
@@ -132,7 +158,7 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
             try {
                 $item_name = $result->getSlotValue('ArmorName');
             } catch (\Exception $e) {
-                $this->_logger->error($e);
+                $this->_logger->error($e->getMessage());
 
                 $this->_readErrorFlow($request, $response, 'I couldn\'t determine which item you meant. Please try again later.');
                 return;
@@ -183,7 +209,7 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
         /** @var array $equipment */
         $equipment = $this->evaluateString($this->_equipment);
-        $found = null;
+        $found = [];
 
         foreach ($equipment as $item) {
             if (!in_array($item['bucketHash'], DestinyBucketEnum::EQUIPPABLE_GEAR)) {
@@ -194,22 +220,36 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
             if ($equipment_name === $itemName) {
                 $this->_logger->info('Found equipped item ['.$equipment_name.']');
-                $found = ["name" => $equipment_name, "itemInstanceId" => $item["itemInstanceId"]];
-                break;
+                $found[] = $item;
             }
         }
 
-        if (!$found) {
+        if (count($found) === 0)
+        {
             $this->_readErrorFlow($request, $response, 'Sorry, you don\'t have '.$itemName.' equipped.');
-            return;
         }
+        else if (count($found) === 1)
+        {
+            $stored_gear[$char_id]["favorites"][] = $found[0];
 
-        $stored_gear[$char_id]["favorites"][$found["name"]] = $found["itemInstanceId"];
+            $params->setServiceParam('stored_gear', $stored_gear);
+    
+            foreach ($this->_ok as $ok) {
+                $ok->read($request, $response);
+            }
+        }
+        else if (count($found) > 1)
+        {
+            $this->_logger->info('Could favorite ['.print_r($found, true).']');
 
-        $params->setServiceParam('stored_gear', $stored_gear);
+            $dupe_name = $this->evaluateString($this->_tagFavoriteDuplicatesStorage);
 
-        foreach ($this->_ok as $ok) {
-            $ok->read($request, $response);
+            $session_params = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+            $session_params->setServiceParam($dupe_name, $found);
+
+            foreach ($this->_tagFavoriteDuplicates as $tfd) {
+                $tfd->read($request, $response);
+            }
         }
     }
 
@@ -232,9 +272,19 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
             $params->setServiceParam('stored_gear', $stored_gear);
         }
 
-        if (!isset($stored_gear[$char_id]["favorites"][$itemName])) {
+        $found = [];
+
+        if (count($stored_gear[$char_id]["favorites"]) === 0) {
             $this->_readErrorFlow($request, $response, 'Sorry, you don\'t have a favorite '.$itemName.'.');
             return;
+        }
+
+        foreach ($stored_gear[$char_id]["favorites"] as $favorite) {
+            $fav_name = strtolower(trim($favorite["manifest"]["displayProperties"]["name"]));
+
+            if ($fav_name === $itemName) {
+                $found[] = $favorite;
+            }
         }
 
         $api_key = $this->evaluateString($this->_apiKey);
@@ -244,13 +294,42 @@ class TagItemProcessor extends AbstractServiceProcessor implements IConversation
 
         $membership_type = $this->evaluateString($this->_membershipType);
 
-        $char_api->equipItem(
-            $stored_gear[$char_id]["favorites"][$itemName],
-            $char_id, $membership_type
-        );
+        if (count($found) === 0)
+        {
+            $this->_readErrorFlow($request, $response, "You don't have a favorite $itemName.");
+            return;
+        }
+        else if (count($found) === 1)
+        {
+            try
+            {
+                $char_api->equipItems(
+                    [$found[0]["itemInstanceId"]],
+                    $char_id, $membership_type
+                );
+        
+                foreach ($this->_ok as $ok) {
+                    $ok->read($request, $response);
+                }
+            }
+            catch (\Exception $e)
+            {
+                $this->_logger->error($e);
+                $this->_readErrorFlow($request, $response, 'Sorry, something went wrong. Please try again later.');
+            }
 
-        foreach ($this->_ok as $ok) {
-            $ok->read($request, $response);
+            return;
+        }
+        else if (count($found) > 1)
+        {
+            $session_parms = $this->getService()->getServiceParams(IServiceParamsScope::SCOPE_TYPE_SESSION);
+
+            $storage_name = $this->evaluateString($this->_equipFavoriteDuplicatesStorage);
+            $session_parms->setServiceParam($storage_name, $found);
+
+            foreach ($this->_equipFavoriteDuplicates as $efd) {
+                $efd->read($request, $response);
+            }
         }
     }
 
