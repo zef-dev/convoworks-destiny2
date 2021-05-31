@@ -45,4 +45,16 @@ abstract class DestinyBucketEnum
     const BUCKET_CLASS_ITEMS = 1585787867;
 
     const BUCKET_VAULT = 138197802;
+
+    const BUCKET_NAME_MAP = [
+        self::BUCKET_KINETIC_WEAPONS => "Kinetic weapon",
+        self::BUCKET_ENERGY_WEAPONS => "Energy weapon",
+        self::BUCKET_POWER_WEAPONS => "Power weapon",
+        
+        self::BUCKET_HELMETS => "Helmet",
+        self::BUCKET_GAUNTLETS => "Gauntlets",
+        self::BUCKET_CHEST_ARMOR => "Chest armor",
+        self::BUCKET_GREAVES => "Greaves",
+        self::BUCKET_CLASS_ITEMS => "Class item"
+    ];
 }
