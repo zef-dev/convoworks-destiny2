@@ -112,7 +112,9 @@ class ItemInstanceElement extends AbstractWorkflowComponent implements IConversa
             $instance['Response']['instance']['data']['energy']['energyType'] = DestinyEnergyEnum::ENERGY_TYPES[$instance['Response']['instance']['data']['energy']['energyType']];
         }
 
-        $params = $this->getService()->getServiceParams($this->_scopeType);
+        $scope_type = $this->evaluateString($this->_scopeType);
+        
+        $params = $this->getService()->getServiceParams($scope_type);
         $params->setServiceParam($this->evaluateString($this->_storageName), $instance['Response']);
     }
 }
