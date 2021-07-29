@@ -57,7 +57,8 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 
     public function read(IConvoRequest $request, IConvoResponse $response)
     {
-		$params = $this->getService()->getServiceParams($this->_scopeType);
+		$scope_type = $this->evaluateString($this->_scopeType);
+		$params = $this->getService()->getServiceParams($scope_type);
 
     	$api_key = $this->evaluateString($this->_apiKey);
     	$acc_tkn = $this->evaluateString($this->_accessToken);
@@ -69,7 +70,18 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 		$msid = $this->evaluateString($this->_membershipId);
 		$chid = $this->evaluateString($this->_characterId);
 
-        $this->_logger->debug('Going to try to load character ['.$mstp.']['.$msid.']['.$chid.']['.print_r($this->_initComponents, true).']');
+		if (!is_array($this->_initComponents)) {
+			$init_components = $this->evaluateString($this->_initComponents);
+		} else {
+			$init_components = $this->_initComponents;
+		}
+
+		if (!is_array($init_components)) {
+			$this->_logger->warning('Did not get array for components to init, got ['.$init_components.'] instead.');
+			return;
+		}
+
+        $this->_logger->info('Going to try to load character ['.$mstp.']['.$msid.']['.$chid.']['.print_r($init_components, true).']');
 
 		$res = $capi->getCharacter($mstp, $msid, $chid, $this->_initComponents, true);
 		$character = [
@@ -83,7 +95,7 @@ class InitializeCharacterElement extends AbstractWorkflowComponent implements IC
 
 		$storage_name = $this->evaluateString($this->_storageName);
 
-		$existing = $this->getService()->getServiceParams($this->_scopeType)->getServiceParam($storage_name);
+		$existing = $this->getService()->getServiceParams($scope_type)->getServiceParam($storage_name);
 		if (!empty($existing)) {
 			$this->_logger->debug('Got existing character to use');
 			$character = $existing;
