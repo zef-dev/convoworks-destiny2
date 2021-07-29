@@ -232,10 +232,10 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         if (count($item_ids) > 1)
         {
             // duplicate items with the same name found
-            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            $params = $this->getService()->getServiceParams($this->evaluateString($this->_duplicateItemsScope));
 
             $name = $this->evaluateString($this->_duplicateItemsName);
-            $this->_logger->debug('Going to store duplicate item IDs ['.implode(', ', $item_ids).'] as ['.$this->_duplicateItemsScope.'.'.$name.']');
+            $this->_logger->debug('Going to store duplicate item IDs ['.implode(', ', $item_ids).'] as ['.$this->evaluateString($this->_duplicateItemsScope).'.'.$name.']');
             
             $params->setServiceParam($name, $item_ids);
 
@@ -271,7 +271,7 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
                         $err_name = $this->evaluateString($this->_errorMessageName);
                         $this->_logger->debug('Setting message ['.$res['Message'].'] under the name ['.$err_name.']');
 
-                        $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+                        $params = $this->getService()->getServiceParams($this->evaluateString($this->_duplicateItemsScope));
                         $params->setServiceParam($err_name, $res['Message']);
                     }
                 }
@@ -286,7 +286,7 @@ class EquipCharacterProcessor extends AbstractServiceProcessor implements IConve
         {
             // none found
             $err_name = $this->evaluateString($this->_errorMessageName);
-            $params = $this->getService()->getServiceParams($this->_duplicateItemsScope);
+            $params = $this->getService()->getServiceParams($this->evaluateString($this->_duplicateItemsScope));
             $params->setServiceParam($err_name, "No item with that name was found.");
 
             foreach ($this->_nok as $nok) {
