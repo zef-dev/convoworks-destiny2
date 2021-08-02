@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.0 -2021-08-02
+
+* Evaluate more parameters throughout components to support raw input
+
 ## 1.0.10 - 2021-05-14
 
 * Use `convoworks-core` v0.22
