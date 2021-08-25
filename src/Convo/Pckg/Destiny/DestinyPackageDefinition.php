@@ -132,7 +132,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'editor_properties' => [
 							'multiple' => false,
 							'options' => [
-								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation', 'user' => 'User'
 							]
 						],
 						'defaultValue' => 'session',
@@ -239,7 +239,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 						'editor_properties' => [
 							'multiple' => false,
 							'options' => [
-								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation'
+								'request' => 'Request', 'session' => 'Session', 'installation' => 'Installation', 'user' => 'User'
 							]
 						],
 						'defaultValue' => 'session',
