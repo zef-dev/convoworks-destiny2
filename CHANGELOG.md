@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.1 - 2021-08-26
+
+* Added User Scope to Request Scope
 ## 1.1.0 - 2021-08-02
 
 * Evaluate more parameters throughout components to support raw input
