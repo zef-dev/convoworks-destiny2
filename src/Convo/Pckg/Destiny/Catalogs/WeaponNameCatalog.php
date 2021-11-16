@@ -8,7 +8,7 @@ use Convo\Core\Workflow\AbstractWorkflowComponent;
 use Convo\Pckg\Destiny\Enums\DestinyBucketEnum;
 use Convo\Pckg\Destiny\Service\DestinyManifestService;
 
-class WeaponNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
+class WeaponNameCatalog extends AbstractWorkflowComponent implements \Convo\Core\Workflow\IServiceCatalog
 {
     const CATALOG_VERSION = "6";
 

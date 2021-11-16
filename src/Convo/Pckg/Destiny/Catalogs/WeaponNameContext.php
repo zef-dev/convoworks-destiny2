@@ -4,7 +4,7 @@ namespace Convo\Pckg\Destiny\Catalogs;
 
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 
-class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core\Workflow\IServiceContext
+class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core\Workflow\IServiceContext, \Convo\Core\Workflow\ICatalogSource
 {
     private $_basePath;
 
@@ -25,6 +25,8 @@ class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core
      */
     private $_catalog;
 
+    private $_version;
+
     private $_apiKey;
 
     public function __construct($catalogName, $basePath, $logger, $httpFactory, $properties)
@@ -36,11 +38,18 @@ class WeaponNameContext extends AbstractWorkflowComponent implements \Convo\Core
         $this->_logger = $logger;
         $this->_httpFactory = $httpFactory;
 
+        $this->_version = $properties['version'];
+
         if (!isset($properties['api_key'])) {
             throw new \Exception('Missing API key');
         }
 
         $this->_apiKey = $properties['api_key'];
+    }
+
+    public function getCatalogVersion()
+    {
+        return $this->evaluateString($this->_version);
     }
 
     public function init()

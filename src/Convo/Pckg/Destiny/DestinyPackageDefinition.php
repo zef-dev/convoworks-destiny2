@@ -1076,6 +1076,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				'Weapon Name Catalog',
 				'Use a catalog entity for weapon names (currently only available on Amazon Alexa)',
 				[
+					'version' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Version',
+						'description' => 'A value or expression that will determine whether or not a new set of values should be published for this catalog.',
+						'valueType' => 'string'
+					],
 					'api_key' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],
@@ -1126,6 +1134,14 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 				'Armor Name Catalog',
 				'Use a catalog entity for armor names (currently only available on Amazon Alexa)',
 				[
+					'version' => [
+						'editor_type' => 'text',
+						'editor_properties' => [],
+						'defaultValue' => null,
+						'name' => 'Version',
+						'description' => 'A value or expression that will determine whether or not a new set of values should be published for this catalog.',
+						'valueType' => 'string'
+					],
 					'api_key' => [
 						'editor_type' => 'text',
 						'editor_properties' => [],

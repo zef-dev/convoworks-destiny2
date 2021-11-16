@@ -8,7 +8,7 @@ use Convo\Pckg\Destiny\Service\DestinyManifestService;
 use Convo\Core\Util\StrUtil;
 use Convo\Core\Workflow\AbstractWorkflowComponent;
 
-class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\ICatalogSource
+class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core\Workflow\IServiceCatalog
 {
 	const CATALOG_VERSION = "5";
 
@@ -29,11 +29,6 @@ class ArmorNameCatalog extends AbstractWorkflowComponent  implements \Convo\Core
 		$this->_logger = $logger;
 		$this->_httpFactory = $httpFactory;
 		$this->_apiKey = $apiKey;
-	}
-
-	public function getCatalogVersion()
-	{
-		return self::CATALOG_VERSION;
 	}
 
 	public function getCatalogValues($platform)
