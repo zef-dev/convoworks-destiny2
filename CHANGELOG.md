@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.2 - 2021-11-16
+
+* Update catalogs to new format
 ## 1.1.1 - 2021-08-26
 
 * Added User Scope to Request Scope
