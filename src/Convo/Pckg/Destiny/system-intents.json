@@ -3,7 +3,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "EquipLoadoutIntent",
@@ -97,7 +98,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "SaveLoadoutIntent",
@@ -220,7 +222,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "EquipWeaponIntent",
@@ -286,7 +289,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "EquipArmorIntent",
@@ -352,7 +356,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "TransferToVaultIntent",
@@ -526,7 +531,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "TransferToCharacterIntent",
@@ -667,7 +673,7 @@
     "FavoriteItemIntent": [
         {
             "platforms": [
-                "amazon", "dialogflow"
+                "amazon", "dialogflow", "dialogflow_es"
             ],
             "definition": {
                 "name": "FavoriteItemIntent",
@@ -855,7 +861,8 @@
         {
             "platforms": [
                 "amazon",
-                "dialogflow"
+                "dialogflow",
+                "dialogflow_es"
             ],
             "definition": {
                 "name": "EquipFavoriteIntent",

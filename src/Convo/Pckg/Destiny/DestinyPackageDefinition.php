@@ -62,6 +62,7 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 		]);
         $entities['WeaponName']->setPlatformModel('amazon', $weapon_name_model);
         $entities['WeaponName']->setPlatformModel('dialogflow', $weapon_name_model);
+        $entities['WeaponName']->setPlatformModel('dialogflow_es', $weapon_name_model);
 
 		$entities['ArmorName'] = new SystemEntity('ArmorName');
 		$weapon_name_model = new EntityModel('ArmorName', false);
@@ -75,7 +76,8 @@ class DestinyPackageDefinition extends AbstractPackageDefinition
 		]);
         $entities['ArmorName']->setPlatformModel('amazon', $weapon_name_model);
         $entities['ArmorName']->setPlatformModel('dialogflow', $weapon_name_model);
-		
+        $entities['ArmorName']->setPlatformModel('dialogflow_es', $weapon_name_model);
+
 		return $entities;
 	}
 
